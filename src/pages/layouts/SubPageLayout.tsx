@@ -2,6 +2,7 @@ import classNames from "classnames";
 
 import { FooterView } from "@/components/layout/Footer";
 import { Navigation } from "@/components/layout/Navigation";
+import React from "react";
 
 export function BlurEllipsis(props: { positionClass?: string }) {
   return (
@@ -23,7 +24,8 @@ export function BlurEllipsis(props: { positionClass?: string }) {
   );
 }
 
-export function SubPageLayout(props: { children: React.ReactNode }) {
+// export function SubPageLayout(props: { children: React.ReactNode }) {
+export const SubPageLayout: React.FC<{ children: React.ReactNode }> = (props) => {
   return (
     <div
       className="bg-background-main"
@@ -41,3 +43,5 @@ export function SubPageLayout(props: { children: React.ReactNode }) {
     </div>
   );
 }
+// 使用 React.memo 包装组件
+export default React.memo(SubPageLayout);

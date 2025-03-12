@@ -14,11 +14,11 @@ cache.setCompare((a, b) => {
 });
 cache.initialize();
 
-export async function searchForMedia(query: MWQuery): Promise<MediaItem[]> {
+export async function searchForMedia(query: MWQuery, language:string): Promise<MediaItem[]> {
   if (cache.has(query)) return cache.get(query) as MediaItem[];
   const { searchQuery } = query;
 
-  const data = await multiSearch(searchQuery);
+  const data = await multiSearch(searchQuery,language);
   const results = data.map((v) => {
     const formattedResult = formatTMDBSearchResult(v, v.media_type);
     return formatTMDBMetaToMediaItem(formattedResult);

@@ -146,23 +146,23 @@ export function SidebarPart() {
         >
           <div className="px-3 py-3.5 rounded-lg bg-largeCard-background bg-opacity-50 grid grid-cols-2 gap-4">
             {/* Hostname */}
-            <div className="col-span-2 space-y-1">
-              <p className="text-type-dimmed font-medium">
-                {t("settings.sidebar.info.hostname")}
-              </p>
-              <p className="text-white">{hostname}</p>
-            </div>
+            {/* <div className="col-span-2 space-y-1"> */}
+            {/*   <p className="text-type-dimmed font-medium"> */}
+            {/*     {t("settings.sidebar.info.hostname")} */}
+            {/*   </p> */}
+            {/*   <p className="text-white">{hostname}</p> */}
+            {/* </div> */}
 
             {/* Backend URL */}
-            <div className="col-span-2 space-y-1">
-              <div className="text-type-dimmed font-medium flex items-center">
-                <p>{t("settings.sidebar.info.backendUrl")}</p>
-                <SecureBadge url={backendUrl} />
-              </div>
-              <p className="text-white">
-                {backendUrl?.replace(/https?:\/\//, "") ?? "—"}
-              </p>
-            </div>
+            {/* <div className="col-span-2 space-y-1"> */}
+            {/*   <div className="text-type-dimmed font-medium flex items-center"> */}
+            {/*     <p>{t("settings.sidebar.info.backendUrl")}</p> */}
+            {/*     <SecureBadge url={backendUrl} /> */}
+            {/*   </div> */}
+            {/*   <p className="text-white"> */}
+            {/*     {backendUrl?.replace(/https?:\/\//, "") ?? "—"} */}
+            {/*   </p> */}
+            {/* </div> */}
 
             {/* User ID */}
             <div className="col-span-2 space-y-1">
@@ -173,37 +173,36 @@ export function SidebarPart() {
                 {account?.userId ?? t("settings.sidebar.info.notLoggedIn")}
               </p>
             </div>
-
             {/* App version */}
-            <div className="col-span-1 space-y-1">
-              <p className="text-type-dimmed font-medium">
-                {t("settings.sidebar.info.appVersion")}
-              </p>
-              <p className="text-type-dimmed px-2 py-1 rounded bg-settings-sidebar-badge inline-block">
-                {conf().APP_VERSION}
-              </p>
-            </div>
+            {/* <div className="col-span-1 space-y-1"> */}
+            {/*   <p className="text-type-dimmed font-medium"> */}
+            {/*     {t("settings.sidebar.info.appVersion")} */}
+            {/*   </p> */}
+            {/*   <p className="text-type-dimmed px-2 py-1 rounded bg-settings-sidebar-badge inline-block"> */}
+            {/*     {conf().APP_VERSION} */}
+            {/*   </p> */}
+            {/* </div> */}
 
             {/* Backend version */}
-            <div className="col-span-1 space-y-1">
-              <p className="text-type-dimmed font-medium">
-                {t("settings.sidebar.info.backendVersion")}
-              </p>
-              <p className="text-type-dimmed px-2 py-1 rounded bg-settings-sidebar-badge inline-flex items-center gap-1">
-                {backendMeta.error ? (
-                  <Icon
-                    icon={Icons.WARNING}
-                    className="text-type-danger text-base"
-                  />
-                ) : null}
-                {backendMeta.loading ? (
-                  <span className="block h-4 w-12 bg-type-dimmed/20 rounded" />
-                ) : (
-                  backendMeta?.value?.version ||
-                  t("settings.sidebar.info.unknownVersion")
-                )}
-              </p>
-            </div>
+            {/* <div className="col-span-1 space-y-1"> */}
+            {/*   <p className="text-type-dimmed font-medium"> */}
+            {/*     {t("settings.sidebar.info.backendVersion")} */}
+            {/*   </p> */}
+            {/*   <p className="text-type-dimmed px-2 py-1 rounded bg-settings-sidebar-badge inline-flex items-center gap-1"> */}
+            {/*     {backendMeta.error ? ( */}
+            {/*       <Icon */}
+            {/*         icon={Icons.WARNING} */}
+            {/*         className="text-type-danger text-base" */}
+            {/*       /> */}
+            {/*     ) : null} */}
+            {/*     {backendMeta.loading ? ( */}
+            {/*       <span className="block h-4 w-12 bg-type-dimmed/20 rounded" /> */}
+            {/*     ) : ( */}
+            {/*       backendMeta?.value?.version || */}
+            {/*       t("settings.sidebar.info.unknownVersion") */}
+            {/*     )} */}
+            {/*   </p> */}
+            {/* </div> */}
           </div>
         </SidebarSection>
       </Sticky>

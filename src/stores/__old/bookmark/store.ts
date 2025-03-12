@@ -16,14 +16,14 @@ export const BookmarkStore = createVersionedStore<BookmarkStoreData>()
   .setKey("mw-bookmarks")
   .addVersion({
     version: 0,
-    migrate(oldBookmarks: OldBookmarks) {
-      return migrateV1Bookmarks(oldBookmarks);
+    migrate(oldBookmarks: OldBookmarks, language:string) {
+      return migrateV1Bookmarks(oldBookmarks, language);
     },
   })
   .addVersion({
     version: 1,
-    migrate(old: BookmarkStoreData) {
-      return migrateV2Bookmarks(old);
+    migrate(old: BookmarkStoreData, language:string) {
+      return migrateV2Bookmarks(old,language);
     },
   })
   .addVersion({

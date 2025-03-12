@@ -184,11 +184,13 @@ export async function get<T>(url: string, params?: object): Promise<T> {
 
 export async function multiSearch(
   query: string,
+  language: string,
 ): Promise<(TMDBMovieSearchResult | TMDBShowSearchResult)[]> {
+
   const data = await get<TMDBSearchResult>("search/multi", {
     query,
     include_adult: false,
-    language: "en-US",
+    language,
     page: 1,
   });
   // filter out results that aren't movies or shows
@@ -202,8 +204,9 @@ export async function multiSearch(
 
 export async function generateQuickSearchMediaUrl(
   query: string,
+  language: string,
 ): Promise<string | undefined> {
-  const data = await multiSearch(query);
+  const data = await multiSearch(query, language);
   if (data.length === 0) return undefined;
   const result = data[0];
   const title =
@@ -227,12 +230,12 @@ type MediaDetailReturn<T extends TMDBContentTypes> =
 export function getMediaDetails<
   T extends TMDBContentTypes,
   TReturn = MediaDetailReturn<T>,
->(id: string, type: T): Promise<TReturn> {
+>(id: string, type: T, language:string): Promise<TReturn> {
   if (type === TMDBContentTypes.MOVIE) {
-    return get<TReturn>(`/movie/${id}`, { append_to_response: "external_ids" });
+    return get<TReturn>(`/movie/${id}`, { append_to_response: "external_ids",language});
   }
   if (type === TMDBContentTypes.TV) {
-    return get<TReturn>(`/tv/${id}`, { append_to_response: "external_ids" });
+    return get<TReturn>(`/tv/${id}`, { append_to_response: "external_ids",language });
   }
   throw new Error("Invalid media type");
 }
@@ -244,8 +247,9 @@ export function getMediaPoster(posterPath: string | null): string | undefined {
 export async function getEpisodes(
   id: string,
   season: number,
+  language:string,
 ): Promise<TMDBEpisodeShort[]> {
-  const data = await get<TMDBSeason>(`/tv/${id}/season/${season}`);
+  const data = await get<TMDBSeason>(`/tv/${id}/season/${season}`, {language});
   return data.episodes.map((e) => ({
     id: e.id,
     episode_number: e.episode_number,
@@ -256,9 +260,11 @@ export async function getEpisodes(
 
 export async function getMovieFromExternalId(
   imdbId: string,
+  language: string
 ): Promise<string | undefined> {
   const data = await get<ExternalIdMovieSearchResult>(`/find/${imdbId}`, {
     external_source: "imdb_id",
+    language
   });
 
   const movie = data.movie_results[0];

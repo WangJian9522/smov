@@ -30,6 +30,7 @@ import { SupportPage } from "@/pages/Support";
 import { Layout } from "@/setup/Layout";
 import { useHistoryListener } from "@/stores/history";
 import { LanguageProvider } from "@/stores/language";
+import { useTranslation } from "react-i18next";
 
 const DeveloperPage = lazy(() => import("@/pages/DeveloperPage"));
 const TestView = lazy(() => import("@/pages/developer/TestView"));
@@ -42,11 +43,11 @@ SettingsPage.preload();
 function LegacyUrlView({ children }: { children: ReactElement }) {
   const location = useLocation();
   const navigate = useNavigate();
-
+  const{i18n}=useTranslation()
   useEffect(() => {
     const url = location.pathname;
     if (!isLegacyUrl(url)) return;
-    convertLegacyUrl(location.pathname).then((convertedUrl) => {
+    convertLegacyUrl(location.pathname, i18n.language).then((convertedUrl) => {
       navigate(convertedUrl ?? "/", { replace: true });
     });
   }, [location.pathname, navigate]);
@@ -58,10 +59,10 @@ function LegacyUrlView({ children }: { children: ReactElement }) {
 function QuickSearch() {
   const { query } = useParams<{ query: string }>();
   const navigate = useNavigate();
-
+  const{i18n}=useTranslation()
   useEffect(() => {
     if (query) {
-      generateQuickSearchMediaUrl(query).then((url) => {
+      generateQuickSearchMediaUrl(query, i18n.language).then((url) => {
         navigate(url ?? "/", { replace: true });
       });
     } else {
@@ -150,8 +151,8 @@ function App() {
             <Route path="/dmca" element={<DmcaPage />} />
           ) : null}
           {/* Support page */}
-          <Route path="/support" element={<SupportPage />} />
-          <Route path="/jip" element={<JipPage />} />
+          {/* <Route path="/support" element={<SupportPage />} /> */}
+          {/* <Route path="/jip" element={<JipPage />} /> */}
           {/* Discover page */}
           <Route path="/discover" element={<Discover />} />
           {/* Settings page */}

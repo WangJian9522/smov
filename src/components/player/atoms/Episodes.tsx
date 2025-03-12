@@ -31,9 +31,9 @@ function CenteredText(props: { children: React.ReactNode }) {
 
 function useSeasonData(mediaId: string, seasonId: string) {
   const [seasons, setSeason] = useState<MWSeasonMeta[] | null>(null);
-
+  const { i18n } = useTranslation();
   const state = useAsync(async () => {
-    const data = await getMetaFromId(MWMediaType.SERIES, mediaId, seasonId);
+    const data = await getMetaFromId(MWMediaType.SERIES, mediaId,i18n.language, seasonId);
     if (data?.meta.type !== MWMediaType.SERIES) return null;
     setSeason(data.meta.seasons);
     return {

@@ -35,7 +35,7 @@ function isDisallowedMedia(id: string, type: MWMediaType): boolean {
 }
 
 export function MetaPart(props: MetaPartProps) {
-  const { t } = useTranslation();
+  const { t,i18n } = useTranslation();
   const params = useParams<{
     media: string;
     episode?: string;
@@ -81,7 +81,7 @@ export function MetaPart(props: MetaPartProps) {
 
     let meta: AsyncReturnType<typeof getMetaFromId> = null;
     try {
-      meta = await getMetaFromId(data.type, data.id, params.season);
+      meta = await getMetaFromId(data.type, data.id, i18n.language, params.season);
     } catch (err) {
       if ((err as any).status === 404) {
         return null;

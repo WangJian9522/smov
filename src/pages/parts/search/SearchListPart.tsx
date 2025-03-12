@@ -58,10 +58,10 @@ function SearchSuffix(props: { failed?: boolean; results?: number }) {
 }
 
 export function SearchListPart({ searchQuery }: { searchQuery: string }) {
-  const { t } = useTranslation();
+  const { t,i18n } = useTranslation();
 
   const [results, setResults] = useState<MediaItem[]>([]);
-  const [state, exec] = useAsyncFn((query: MWQuery) => searchForMedia(query));
+  const [state, exec] = useAsyncFn((query: MWQuery) => searchForMedia(query, i18n.language));
 
   useEffect(() => {
     async function runSearch(query: MWQuery) {

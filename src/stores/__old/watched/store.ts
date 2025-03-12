@@ -18,14 +18,14 @@ export const VideoProgressStore = createVersionedStore<WatchedStoreData>()
   })
   .addVersion({
     version: 1,
-    async migrate(old: OldData) {
-      return migrateV2Videos(old);
+    async migrate(old: OldData,language: string,) {
+      return migrateV2Videos(old, language);
     },
   })
   .addVersion({
     version: 2,
-    migrate(old: WatchedStoreData) {
-      return migrateV3Videos(old);
+    migrate(old: WatchedStoreData,language: string,) {
+      return migrateV3Videos(old, language);
     },
   })
   .addVersion({

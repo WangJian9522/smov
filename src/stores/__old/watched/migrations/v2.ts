@@ -36,6 +36,7 @@ export interface OldBookmarks {
 
 async function getMetas(
   uniqueMedias: Record<string, any>,
+  language: string,
   oldData?: OldData,
 ): Promise<Record<string, Record<string, DetailedMeta | null>> | undefined> {
   const yearsAreClose = (a: number, b: number) => {
@@ -49,7 +50,7 @@ async function getMetas(
       const year = Number(item.year.toString().split("-")[0]);
       const data = await searchForMedia({
         searchQuery: `${item.title} ${year}`,
-      });
+      },language);
       const relevantItem = data.find(
         (res) =>
           yearsAreClose(Number(res.year), year) &&
@@ -71,7 +72,7 @@ async function getMetas(
 
     let keys: (string | null)[][] = [["0", "0"]];
     if (item.data.type === "show") {
-      const meta = await getMetaFromId(MWMediaType.SERIES, item.data.id);
+      const meta = await getMetaFromId(MWMediaType.SERIES, item.data.id, language);
       if (!meta || !meta?.meta.seasons) return;
       const seasonNumbers = [
         ...new Set(
@@ -98,6 +99,7 @@ async function getMetas(
         mediaMetas[item.id][key] = await getMetaFromId(
           mediaItemTypeToMediaType(item.data.type),
           item.data.id,
+          language,
           id === "0" || id === null ? undefined : id,
         );
       }),
@@ -107,7 +109,7 @@ async function getMetas(
   return mediaMetas;
 }
 
-export async function migrateV1Bookmarks(old: OldBookmarks) {
+export async function migrateV1Bookmarks(old: OldBookmarks,language: string,) {
   const oldData = old;
   if (!oldData) return;
 
@@ -117,7 +119,7 @@ export async function migrateV1Bookmarks(old: OldBookmarks) {
     uniqueMedias[item.mediaId] = item;
   });
 
-  const mediaMetas = await getMetas(uniqueMedias);
+  const mediaMetas = await getMetas(uniqueMedias,language);
   if (!mediaMetas) return;
 
   const bookmarks = Object.keys(mediaMetas)
@@ -130,7 +132,7 @@ export async function migrateV1Bookmarks(old: OldBookmarks) {
   };
 }
 
-export async function migrateV2Videos(old: OldData) {
+export async function migrateV2Videos(old: OldData, language: string,) {
   const oldData = old;
   if (!oldData) return;
 
@@ -140,7 +142,7 @@ export async function migrateV2Videos(old: OldData) {
     uniqueMedias[item.mediaId] = item;
   });
 
-  const mediaMetas = await getMetas(uniqueMedias, oldData);
+  const mediaMetas = await getMetas(uniqueMedias, language, oldData, );
   if (!mediaMetas) return;
 
   // We've got all the metadata you can dream of now

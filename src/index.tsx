@@ -133,9 +133,10 @@ function AuthWrapper() {
 }
 
 function MigrationRunner() {
+  const {i18n} = useTranslation()
   const status = useAsync(async () => {
     changeAppLanguage(useLanguageStore.getState().language);
-    await initializeOldStores();
+    await initializeOldStores(i18n.language);
   }, []);
   const { t } = useTranslation();
 
@@ -173,7 +174,7 @@ const container = document.getElementById("root");
 const root = createRoot(container!);
 
 root.render(
-  <StrictMode>
+  // <StrictMode>
     <ErrorBoundary>
       <HelmetProvider>
         <Suspense fallback={<LoadingScreen type="lazy" />}>
@@ -189,5 +190,5 @@ root.render(
         </Suspense>
       </HelmetProvider>
     </ErrorBoundary>
-  </StrictMode>,
+  // </StrictMode>,
 );

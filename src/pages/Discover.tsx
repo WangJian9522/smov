@@ -1,585 +1,513 @@
-// Based mfs only use only one 500 line file instead of ten 50 line files.
-import { useEffect, useRef, useState } from "react";
-import { Helmet } from "react-helmet-async";
+import { Splide, SplideSlide, SplideTrack } from "@splidejs/react-splide";
+import React, { useEffect, useRef, useState } from "react";
+import { SubPageLayout } from "@/pages/layouts/SubPageLayout";
+import "@splidejs/react-splide/css";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-
+import { Icon, Icons } from "@/components/Icon";
+import { Tab } from "@headlessui/react";
+import { Helmet } from "react-helmet-async";
+import { PageTitle } from "@/pages/parts/util/PageTitle";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { get } from "@/backend/metadata/tmdb";
-import { ThiccContainer } from "@/components/layout/ThinContainer";
-import { Divider } from "@/components/utils/Divider";
-import { Flare } from "@/components/utils/Flare";
 import { conf } from "@/setup/config";
-import {
-  Category,
-  Genre,
-  Media,
-  Movie,
-  TVShow,
-  categories,
-  tvCategories,
-} from "@/utils/discover";
 
-import { SubPageLayout } from "./layouts/SubPageLayout";
-import { Icon, Icons } from "../components/Icon";
-import { PageTitle } from "./parts/util/PageTitle";
+interface Movie {
+    id: number,
+    title: string,
+    name: string, // tv变名
 
-export function Discover() {
-  const { t } = useTranslation();
-  const [genres, setGenres] = useState<Genre[]>([]);
-  const [randomMovie, setRandomMovie] = useState<Movie | null>(null);
-  const [genreMovies, setGenreMovies] = useState<{
-    [genreId: number]: Movie[];
-  }>({});
-  const [countdown, setCountdown] = useState<number | null>(null);
-  const navigate = useNavigate();
-  const [categoryShows, setCategoryShows] = useState<{
-    [categoryName: string]: Movie[];
-  }>({});
-  const [categoryMovies, setCategoryMovies] = useState<{
-    [categoryName: string]: Movie[];
-  }>({});
-  const [tvGenres, setTVGenres] = useState<Genre[]>([]);
-  const [tvShowGenres, setTVShowGenres] = useState<{
-    [genreId: number]: TVShow[];
-  }>({});
-  const carouselRef = useRef<HTMLDivElement>(null);
-  const carouselRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-  const gradientRef = useRef<HTMLDivElement>(null);
-  const [countdownTimeout, setCountdownTimeout] =
-    useState<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    const fetchMoviesForCategory = async (category: Category) => {
-      try {
-        const data = await get<any>(category.endpoint, {
-          api_key: conf().TMDB_READ_API_KEY,
-          language: "en-US",
-        });
-
-        // Shuffle the movies
-        for (let i = data.results.length - 1; i > 0; i -= 1) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [data.results[i], data.results[j]] = [
-            data.results[j],
-            data.results[i],
-          ];
-        }
-
-        setCategoryMovies((prevCategoryMovies) => ({
-          ...prevCategoryMovies,
-          [category.name]: data.results,
-        }));
-      } catch (error) {
-        console.error(
-          `Error fetching movies for category ${category.name}:`,
-          error,
-        );
-      }
-    };
-    categories.forEach(fetchMoviesForCategory);
-  }, []);
-
-  useEffect(() => {
-    const fetchShowsForCategory = async (category: Category) => {
-      try {
-        const data = await get<any>(category.endpoint, {
-          api_key: conf().TMDB_READ_API_KEY,
-          language: "en-US",
-        });
-
-        // Shuffle the TV shows
-        for (let i = data.results.length - 1; i > 0; i -= 1) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [data.results[i], data.results[j]] = [
-            data.results[j],
-            data.results[i],
-          ];
-        }
-
-        setCategoryShows((prevCategoryShows) => ({
-          ...prevCategoryShows,
-          [category.name]: data.results,
-        }));
-      } catch (error) {
-        console.error(
-          `Error fetching movies for category ${category.name}:`,
-          error,
-        );
-      }
-    };
-    tvCategories.forEach(fetchShowsForCategory);
-  }, []);
-
-  // Fetch TV show genres
-  useEffect(() => {
-    const fetchTVGenres = async () => {
-      try {
-        const data = await get<any>("/genre/tv/list", {
-          api_key: conf().TMDB_READ_API_KEY,
-          language: "en-US",
-        });
-
-        // Shuffle the array of genres
-        for (let i = data.genres.length - 1; i > 0; i -= 1) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [data.genres[i], data.genres[j]] = [data.genres[j], data.genres[i]];
-        }
-
-        // Fetch only the first 6 TV show genres
-        setTVGenres(data.genres.slice(0, 6));
-      } catch (error) {
-        console.error("Error fetching TV show genres:", error);
-      }
-    };
-
-    fetchTVGenres();
-  }, []);
-
-  // Fetch TV shows for each genre
-  useEffect(() => {
-    const fetchTVShowsForGenre = async (genreId: number) => {
-      try {
-        const data = await get<any>("/discover/tv", {
-          api_key: conf().TMDB_READ_API_KEY,
-          with_genres: genreId.toString(),
-          language: "en-US",
-        });
-
-        // Shuffle the TV shows
-        for (let i = data.results.length - 1; i > 0; i -= 1) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [data.results[i], data.results[j]] = [
-            data.results[j],
-            data.results[i],
-          ];
-        }
-
-        setTVShowGenres((prevTVShowGenres) => ({
-          ...prevTVShowGenres,
-          [genreId]: data.results,
-        }));
-      } catch (error) {
-        console.error(`Error fetching TV shows for genre ${genreId}:`, error);
-      }
-    };
-
-    tvGenres.forEach((genre) => fetchTVShowsForGenre(genre.id));
-  }, [tvGenres]);
-
-  // Fetch Movie genres
-  useEffect(() => {
-    const fetchGenres = async () => {
-      try {
-        const data = await get<any>("/genre/movie/list", {
-          api_key: conf().TMDB_READ_API_KEY,
-          language: "en-US",
-        });
-
-        // Shuffle the array of genres
-        for (let i = data.genres.length - 1; i > 0; i -= 1) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [data.genres[i], data.genres[j]] = [data.genres[j], data.genres[i]];
-        }
-
-        // Fetch only the first 4 genres
-        setGenres(data.genres.slice(0, 4));
-      } catch (error) {
-        console.error("Error fetching genres:", error);
-      }
-    };
-
-    fetchGenres();
-  }, []);
-
-  // Fetch movies for each genre
-  useEffect(() => {
-    const fetchMoviesForGenre = async (genreId: number) => {
-      try {
-        const movies: any[] = [];
-        for (let page = 1; page <= 6; page += 1) {
-          // Fetch only 6 pages
-          const data = await get<any>("/discover/movie", {
-            api_key: conf().TMDB_READ_API_KEY,
-            with_genres: genreId.toString(),
-            language: "en-US",
-            page: page.toString(),
-          });
-
-          movies.push(...data.results);
-        }
-
-        // Shuffle the movies
-        for (let i = movies.length - 1; i > 0; i -= 1) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [movies[i], movies[j]] = [movies[j], movies[i]];
-        }
-
-        setGenreMovies((prevGenreMovies) => ({
-          ...prevGenreMovies,
-          [genreId]: movies,
-        }));
-      } catch (error) {
-        console.error(`Error fetching movies for genre ${genreId}:`, error);
-      }
-    };
-
-    genres.forEach((genre) => fetchMoviesForGenre(genre.id));
-  }, [genres]);
-
-  function scrollCarousel(categorySlug: string, direction: string) {
-    const carousel = carouselRefs.current[categorySlug];
-    if (carousel) {
-      const movieElements = carousel.getElementsByTagName("a");
-      if (movieElements.length > 0) {
-        const movieWidth = movieElements[0].offsetWidth;
-        const visibleMovies = Math.floor(carousel.offsetWidth / movieWidth);
-        const scrollAmount = movieWidth * visibleMovies * 0.69; // Silly number :3
-
-        if (direction === "left") {
-          carousel.scrollBy({ left: -scrollAmount, behavior: "smooth" });
-        } else {
-          carousel.scrollBy({ left: scrollAmount, behavior: "smooth" });
-        }
-      }
-    }
-  }
-
-  const [movieWidth, setMovieWidth] = useState(
-    window.innerWidth < 600 ? "150px" : "200px",
-  );
-
-  useEffect(() => {
-    const handleResize = () => {
-      setMovieWidth(window.innerWidth < 600 ? "150px" : "200px");
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (carouselRef.current && gradientRef.current) {
-      const carouselHeight = carouselRef.current.getBoundingClientRect().height;
-      gradientRef.current.style.top = `${carouselHeight}px`;
-      gradientRef.current.style.bottom = `${carouselHeight}px`;
-    }
-  }, [movieWidth]);
-
-  const browser = !!window.chrome; // detect chromium browser
-  let isScrolling = false;
-
-  function handleWheel(e: React.WheelEvent, categorySlug: string) {
-    if (isScrolling) {
-      return;
-    }
-
-    isScrolling = true;
-    const carousel = carouselRefs.current[categorySlug];
-    if (carousel && !e.deltaX) {
-      const movieElements = carousel.getElementsByTagName("a");
-      if (movieElements.length > 0) {
-        if (e.deltaY < 5) {
-          scrollCarousel(categorySlug, "left");
-        } else {
-          scrollCarousel(categorySlug, "right");
-        }
-      }
-    }
-
-    if (browser) {
-      setTimeout(() => {
-        isScrolling = false;
-      }, 345); // disable scrolling after 345 milliseconds for chromium-based browsers
-    } else {
-      // immediately reset isScrolling for non-chromium browsers
-      isScrolling = false;
-    }
-  }
-
-  const [isHovered, setIsHovered] = useState(false);
-  const toggleHover = (isHovering: boolean) => setIsHovered(isHovering);
-
-  useEffect(() => {
-    document.body.style.overflow = isHovered ? "hidden" : "auto";
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [isHovered]);
-
-  function renderMovies(medias: Media[], category: string, isTVShow = false) {
-    const categorySlug = `${category.toLowerCase().replace(/ /g, "-")}${Math.random()}`; // Convert the category to a slug
-    const displayCategory =
-      category === "Now Playing"
-        ? "In Cinemas"
-        : category.includes("Movie")
-          ? `${category}s`
-          : isTVShow
-            ? `${category} Shows`
-            : `${category} Movies`;
-
-    // https://tailwindcss.com/docs/border-style
-    return (
-      <div className="relative overflow-hidden mt-2">
-        <h2 className="text-2xl cursor-default font-bold text-white sm:text-3xl md:text-2xl mx-auto pl-5">
-          {displayCategory}
-        </h2>
-        <div
-          id={`carousel-${categorySlug}`}
-          className="flex whitespace-nowrap pt-4 overflow-auto scrollbar rounded-xl overflow-y-hidden"
-          style={{
-            scrollbarWidth: "thin",
-            // scrollbarColor: `${bgColor} transparent`,
-            scrollbarColor: "transparent transparent",
-          }}
-          ref={(el) => {
-            carouselRefs.current[categorySlug] = el;
-          }}
-          onMouseEnter={() => toggleHover(true)}
-          onMouseLeave={() => toggleHover(false)}
-          onWheel={(e) => handleWheel(e, categorySlug)}
-        >
-          {medias
-            .filter((media, index, self) => {
-              return (
-                index ===
-                self.findIndex(
-                  (m) => m.id === media.id && m.title === media.title,
-                )
-              );
-            })
-            .slice(0, 20)
-            .map((media) => (
-              <a
-                key={media.id}
-                onClick={() =>
-                  navigate(
-                    `/media/tmdb-${isTVShow ? "tv" : "movie"}-${media.id}-${
-                      isTVShow ? media.name : media.title
-                    }`,
-                  )
-                }
-                className="text-center relative mt-3 mx-[0.285em] mb-3 transition-transform hover:scale-105 duration-[0.45s]"
-                style={{ flex: `0 0 ${movieWidth}` }} // Set a fixed width for each movie
-              >
-                <Flare.Base className="group cursor-pointer rounded-xl relative p-[0.65em] bg-background-main transition-colors duration-300 bg-transparent">
-                  <Flare.Light
-                    flareSize={300}
-                    cssColorVar="--colors-mediaCard-hoverAccent"
-                    backgroundClass="bg-mediaCard-hoverBackground duration-200"
-                    className="rounded-xl bg-background-main group-hover:opacity-100"
-                  />
-                  <img
-                    src={
-                      media.poster_path
-                        ? `https://image.tmdb.org/t/p/w500${media.poster_path}`
-                        : "/placeholder.png"
-                    }
-                    alt={media.poster_path ? "" : "failed to fetch :("}
-                    loading="lazy"
-                    className="rounded-xl relative"
-                  />
-                  <h1 className="group relative pt-2 text-[13.5px] whitespace-normal duration-[0.35s] font-semibold text-white opacity-0 group-hover:opacity-100">
-                    {isTVShow
-                      ? (media.name?.length ?? 0) > 32
-                        ? `${media.name?.slice(0, 32)}...`
-                        : media.name
-                      : (media.title?.length ?? 0) > 32
-                        ? `${media.title?.slice(0, 32)}...`
-                        : media.title}
-                  </h1>
-                </Flare.Base>
-              </a>
-            ))}
-        </div>
-
-        <div className="flex items-center justify-center">
-          <button
-            type="button"
-            title="Back"
-            className="absolute left-5 top-1/2 transform -translate-y-3/4 z-10"
-            onClick={() => scrollCarousel(categorySlug, "left")}
-          >
-            <div className="cursor-pointer text-white flex justify-center items-center h-10 w-10 rounded-full bg-search-hoverBackground active:scale-110 transition-[transform,background-color] duration-200">
-              <Icon icon={Icons.ARROW_LEFT} />
-            </div>
-          </button>
-          <button
-            type="button"
-            title="Next"
-            className="absolute right-5 top-1/2 transform -translate-y-3/4 z-10"
-            onClick={() => scrollCarousel(categorySlug, "right")}
-          >
-            <div className="cursor-pointer text-white flex justify-center items-center h-10 w-10 rounded-full bg-search-hoverBackground active:scale-110 transition-[transform,background-color] duration-200">
-              <Icon icon={Icons.ARROW_RIGHT} />
-            </div>
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const handleRandomMovieClick = () => {
-    const allMovies = Object.values(genreMovies).flat(); // Flatten all movie arrays
-    const uniqueTitles = new Set<string>(); // Use a Set to store unique titles
-    allMovies.forEach((movie) => uniqueTitles.add(movie.title)); // Add each title to the Set
-    const uniqueTitlesArray = Array.from(uniqueTitles); // Convert the Set back to an array
-    const randomIndex = Math.floor(Math.random() * uniqueTitlesArray.length);
-    const selectedMovie = allMovies.find(
-      (movie) => movie.title === uniqueTitlesArray[randomIndex],
-    );
-
-    if (selectedMovie) {
-      setRandomMovie(selectedMovie);
-
-      if (countdown !== null && countdown > 0) {
-        // Clear the countdown
-        setCountdown(null);
-        if (countdownTimeout) {
-          clearTimeout(countdownTimeout);
-          setCountdownTimeout(null);
-          setRandomMovie(null);
-        }
-      } else {
-        setCountdown(5);
-
-        // Schedule navigation after 5 seconds
-        const timeoutId = setTimeout(() => {
-          navigate(
-            `/media/tmdb-movie-${selectedMovie.id}-${selectedMovie.title}`,
-          );
-        }, 5000);
-        setCountdownTimeout(timeoutId);
-      }
-    }
-  };
-
-  useEffect(() => {
-    let countdownInterval: NodeJS.Timeout;
-    if (countdown !== null && countdown > 0) {
-      countdownInterval = setInterval(() => {
-        setCountdown((prevCountdown) =>
-          prevCountdown !== null ? prevCountdown - 1 : prevCountdown,
-        );
-      }, 1000);
-    }
-
-    return () => {
-      clearInterval(countdownInterval);
-    };
-  }, [countdown]);
-
-  return (
-    <SubPageLayout>
-      <div className="mb-16 sm:mb-2">
-        <Helmet>
-          {/* Hide scrollbar lmao */}
-          <style type="text/css">{`
-            html, body {
-              scrollbar-width: none;
-              -ms-overflow-style: none;
-            }
-          `}</style>
-        </Helmet>
-        <PageTitle subpage k="global.pages.discover" />
-        <div className="mt-44 space-y-16 text-center">
-          <div className="relative z-10 mb-16">
-            <h1 className="text-4xl cursor-default font-bold text-white">
-              {t("global.pages.discover")}
-            </h1>
-          </div>
-        </div>
-      </div>
-      <ThiccContainer>
-        <div className="flex items-center justify-center mb-6">
-          <button
-            type="button"
-            className="flex items-center space-x-2 rounded-full px-4 text-white py-2 bg-pill-background bg-opacity-50 hover:bg-pill-backgroundHover transition-[background,transform] duration-100 hover:scale-105"
-            onClick={handleRandomMovieClick}
-          >
-            <span className="flex items-center">
-              {countdown !== null && countdown > 0 ? (
-                <div className="flex items-center inline-block">
-                  <span>Cancel Countdown</span>
-                  <Icon
-                    icon={Icons.X}
-                    className="text-2xl ml-[4.5px] mb-[-0.7px]"
-                  />
-                </div>
-              ) : (
-                <div className="flex items-center inline-block">
-                  <span>Watch Something New</span>
-                  <img
-                    src="/lightbar-images/dice.svg"
-                    alt="Small Image"
-                    style={{
-                      marginLeft: "8px",
-                    }}
-                  />
-                </div>
-              )}
-            </span>
-          </button>
-        </div>
-        {randomMovie && (
-          <div className="mt-4 mb-4 text-center">
-            <p>
-              Now Playing <span className="font-bold">{randomMovie.title}</span>{" "}
-              in {countdown}
-            </p>
-          </div>
-        )}
-        <div className="flex flex-col">
-          {categories.map((category) => (
-            <div
-              key={category.name}
-              id={`carousel-${category.name.toLowerCase().replace(/ /g, "-")}`}
-              className="mt-8"
-            >
-              {renderMovies(categoryMovies[category.name] || [], category.name)}
-            </div>
-          ))}
-          {genres.map((genre) => (
-            <div
-              key={`${genre.id}|${genre.name}`}
-              id={`carousel-${genre.name.toLowerCase().replace(/ /g, "-")}`}
-              className="mt-8"
-            >
-              {renderMovies(genreMovies[genre.id] || [], genre.name)}
-            </div>
-          ))}
-          <div className="flex items-center">
-            <Divider marginClass="mr-5" />
-            <h1 className="text-4xl font-bold text-white mx-auto">Shows</h1>
-            <Divider marginClass="ml-5" />
-          </div>
-          {tvCategories.map((category) => (
-            <div
-              key={category.name}
-              id={`carousel-${category.name.toLowerCase().replace(/ /g, "-")}`}
-              className="mt-8"
-            >
-              {renderMovies(
-                categoryShows[category.name] || [],
-                category.name,
-                true,
-              )}
-            </div>
-          ))}
-          {tvGenres.map((genre) => (
-            <div
-              key={`${genre.id}|${genre.name}`}
-              id={`carousel-${genre.name.toLowerCase().replace(/ /g, "-")}`}
-              className="mt-8"
-            >
-              {renderMovies(tvShowGenres[genre.id] || [], genre.name, true)}
-            </div>
-          ))}
-        </div>
-      </ThiccContainer>
-    </SubPageLayout>
-  );
+    // 描述
+    overview: string,
+    genre_ids: Array<number>,
+    // 发布时间 "2022-03-30"
+    release_date: string,
+    first_air_date: string, // tv变名
+    // 原始语言
+    original_language: string,
+    adult: boolean,
+    backdrop_path: string,
+    // 相关分
+    popularity: number,
+    poster_path: string,
+    vote_average: number,
+    video: boolean,
 }
+
+interface WatchProviders {
+    [key: string]: number; // 定义索引签名
+}
+
+interface Providers {
+    Netflix: Array<Movie>,
+    Prime: Array<Movie>,
+    Max: Array<Movie>,
+    Disney: Array<Movie>,
+    AppleTV: Array<Movie>,
+    Paramount: Array<Movie>
+}
+
+interface Data {
+    now_playing: Array<Movie>,
+    popular: Array<Movie>,
+    top_rated: Array<Movie>,
+    upcoming: Array<Movie>,
+    watch_providers: Providers,
+}
+
+export const Discover: React.FC = () => {
+    const { t, i18n } = useTranslation();
+    // {t("settings.account.admin.title")}
+    const i18nLang = i18n.language;
+    const [searchParams, setSearchParams] = useSearchParams();
+    const movieType = searchParams.get("type") === "tv" ? "tv" : "movie";
+    const movieUrls = {
+        "now_playing": `movie/now_playing`,
+        "popular": `movie/popular`,
+        "top_rated": `movie/top_rated`,
+        "upcoming": `movie/upcoming`,
+        "watch_providers": (provider_code: string) => `discover/movie?with_watch_providers=${provider_code}&watch_region=US`
+    };
+    const seriesUrls = {
+        "now_playing": `tv/airing_today`,
+        "popular": `tv/popular`,
+        "top_rated": `tv/top_rated`,
+        "upcoming": `tv/on_the_air`,
+        "watch_providers": (provider_code: string) => `discover/tv?with_watch_providers=${provider_code}&watch_region=US`
+    };
+    const watchProviders: WatchProviders = {
+        Netflix: 8,
+        Prime: 9,
+        Max: 1899,
+        Disney: 337,
+        AppleTV: 2,
+        Paramount: 531
+    };
+    const posterUrl = (uri: string) => `https://image.tmdb.org/t/p/w440_and_h660_face${uri}`;
+    const backdropUrl = (uri: string) => `https://image.tmdb.org/t/p/original${uri}`;
+    const [data, setData] = useState<Data>();
+    const [loading, setLoading] = useState<boolean>(true);
+    // 使用 useRef 来确保请求只在首次加载时进行
+    const didFetch = useRef(false);
+    const navigate = useNavigate();
+    const [flatData, setFlatData] = useState<Array<any>>([]);
+    const requestData = async (url: string) => {
+        return get<any>(url, {
+            api_key: conf().TMDB_READ_API_KEY,
+            language: i18nLang
+        }).then(res => res.results);
+    };
+    // 页面渲染后一次性完成所有请求
+    useEffect(() => {
+        const fetchAllData = async () => {
+            if (didFetch.current) return;
+            const tmdbUrls: any = movieType === "tv" ? seriesUrls : movieUrls;
+            const tempReq: Array<any> = [];
+            // const tempProvReq: Array<any> = [];
+            // const tempProData: any = {};
+            // 循环所有的板块url
+            Object.keys(tmdbUrls).forEach((urlName) => {
+                // 提供商需要多次请求
+                if (urlName === "watch_providers") {
+                    Object.keys(watchProviders).forEach(providerName => {
+                        // 获取&&拼接提供商url
+                        const providerUrl = tmdbUrls[urlName](watchProviders[providerName]);
+                        // 存储提供商请求为一元，读取时根据provName判断
+                        tempReq.push({ name: urlName, provName: providerName, req: requestData(providerUrl) });
+                    });
+                } else {
+                    // 存储常规请求
+                    tempReq.push({ name: urlName, req: requestData(tmdbUrls[urlName]) });
+                }
+            });
+            try {
+                const results = await Promise.all(tempReq.map(req => req.req));
+                const fuck: Array<any> = [];
+                const combinedData = tempReq.reduce((acc, item, index) => {
+                    if (item.provName) {
+                        acc[item.name] = acc[item.name] || {};
+                        acc[item.name][item.provName] = results[index];
+                    } else {
+                        acc[item.name] = results[index];
+                    }
+                    fuck.push(...results[index]);
+                    return acc;
+                }, {});
+                setFlatData(fuck);
+                setData(combinedData);
+                setLoading(false);
+                didFetch.current = true; // 请求完成后设置为 true
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                setLoading(false);
+            }
+        };
+        fetchAllData();
+    }, []);
+
+    function renderArrow() {
+        return (
+            <div className="splide__arrows">
+                <button type="button"
+                        className="splide__arrow--prev absolute top-1/2 transform -translate-y-3/4 z-10 !left-[.5em]">
+                    <div
+                        className="cursor-pointer text-white flex justify-center items-center h-10 w-10 rounded-full bg-search-hoverBackground active:scale-110 transition-[transform,background-color] duration-200">
+                        <Icon icon={Icons.ARROW_RIGHT} />
+                    </div>
+                </button>
+                <button type="button"
+                        className="splide__arrow--next absolute top-1/2 transform -translate-y-3/4 z-10 !right-[.5em]">
+                    <div
+                        className="cursor-pointer text-white flex justify-center items-center h-10 w-10 rounded-full bg-search-hoverBackground active:scale-110 transition-[transform,background-color] duration-200">
+                        <Icon icon={Icons.ARROW_RIGHT} />
+                    </div>
+                </button>
+            </div>
+        );
+    }
+
+    function randomMovie() {
+        // 根据对象的某个键（如 id）进行去重
+        const uniqueArray = Array.from(new Set(flatData.map(item => item.id)))
+        .map(id => {
+            return flatData.find(item => item.id === id);
+        });
+
+        // 随机选择一个元素
+        const movie = uniqueArray[Math.floor(Math.random() * uniqueArray.length)];
+        console.log(movie);
+        return `/media/tmdb-${movieType}-${movie.id}-${movieType === "movie" ? movie.title : movie.name}`;
+    }
+
+    return (
+        <SubPageLayout>
+            <div className="mx-auto max-w-full px-8 w-[1300px] sm:px-16">
+                {/* 标题 */}
+                <div className="mb-16 sm:mb-2">
+                    <Helmet>
+                        {/* Hide scrollbar lmao */}
+                        <style type="text/css">{`
+                        // html, body {
+                        //   scrollbar-width: none;
+                        //   -ms-overflow-style: none;
+                        // }
+                        .watch_providers::-webkit-scrollbar{
+                            height: 1px;
+                        }
+                        .dice-image {
+                          transition: transform 0.3s ease;
+                        }
+                        
+                        .dice-btn:hover .dice-image {
+                          transform: rotate(360deg);
+                        }
+                        .incoming::-webkit-scrollbar{
+                            width: 1px;
+                        }
+                      `}</style>
+                    </Helmet>
+                    <PageTitle subpage k="discover.discover" />
+                    <div className="mt-44 space-y-16 text-center">
+                        <div className="relative z-10 mb-16">
+                            <h1 className="text-4xl cursor-default font-bold text-white">
+                                {t("discover.discover")}
+                            </h1>
+                        </div>
+                    </div>
+                </div>
+                {/* 随机选择播放 */}
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex flex-nowrap gap-3">
+                        <a type="button" href="?type=movie"
+                           onClick={movieType === "movie" ? (event) => {
+                               event.preventDefault();
+                           } : undefined}
+                           className={[
+                               "flex items-center space-x-2 rounded-full px-4 text-white py-2",
+                               movieType === "movie" ? "bg-pill-background bg-opacity-50 cursor-not-allowed" : "hover:bg-pill-backgroundHover transition-[background,transform] duration-100 hover:scale-105"
+                           ].join(" ")}>
+                            {t("discover.movie")}
+                        </a>
+                        <a type="button" href="?type=tv"
+                           onClick={movieType === "tv" ? (event) => {
+                               event.preventDefault();
+                           } : undefined}
+                           className={[
+                               "flex items-center space-x-2 rounded-full px-4 text-white py-2",
+                               movieType === "tv" ? "bg-pill-background bg-opacity-50 cursor-not-allowed" : "hover:bg-pill-backgroundHover transition-[background,transform] duration-100 hover:scale-105"
+                           ].join(" ")}>
+                            {t("discover.series")}
+                        </a>
+                    </div>
+                    <button type="button"
+                            onClick={() => navigate(
+                                randomMovie()
+                            )}
+                            className="flex items-center space-x-2 rounded-full px-4 text-white py-2 bg-pill-background bg-opacity-50 hover:bg-pill-backgroundHover transition-[background,transform] duration-100 hover:scale-105 dice-btn">
+                        <div className="flex items-center">
+                            <div>{t("discover.random_watch")}</div>
+                            <img src="/lightbar-images/dice.svg" alt="Small Image" className="ml-3 dice-image" />
+                        </div>
+                    </button>
+                </div>
+                {/* 电影 */}
+                <div className="flex flex-col md:flex-row md:space-x-10">
+                    <div className="w-full md:w-[70%] space-y-8">
+                        <div>
+                            <h2 className="text-2xl cursor-default font-bold text-white sm:text-3xl md:text-2xl mx-auto pb-6">
+                                {t("discover.now_playing")} 🔥
+                            </h2>
+                            <Splide hasTrack={false}
+                                    options={{ rewind: true, drag: true, gap: "1em", pagination: false }}
+                                    aria-label="React Splide Example">
+                                {renderArrow()}
+                                <SplideTrack className="md:!pr-[30%]">
+                                    {loading ? (
+                                        Array.from({ length: 2 }).map((temp, index) => (
+                                            <SplideSlide key={index}>
+                                                <div
+                                                    className="aspect-[16/9] animate-pulse bg-pill-background opacity-10 rounded-lg"></div>
+                                            </SplideSlide>
+                                        ))
+                                    ) : (
+                                        data?.now_playing.map((movie) => (
+                                            <SplideSlide key={movie.id}>
+                                                <div className="relative aspect-[16/9]">
+                                                    <img src={movie.backdrop_path?backdropUrl(movie.backdrop_path):"/placeholder-backdrop.png"}
+                                                         alt={movie.title || movie.name}
+                                                         className="rounded-lg" />
+                                                    <div className="absolute inset-0 flex flex-nowrap bg-[#00000030] hover:bg-[#00000060] duration-300 rounded-lg">
+                                                        <div className="w-[46%] h-full flex items-center justify-center py-5 sm:py-8">
+                                                            <img
+                                                                className="rounded-lg object-cover object-top w-auto max-h-full"
+                                                                src={posterUrl(movie.poster_path)}
+                                                                alt={movie.title || movie.name} />
+                                                        </div>
+                                                        <div className="w-[64%] py-6 sm:py-8 pr-5 flex items-end">
+                                                            <div>
+                                                            <h3 className="text-gray-100 font-semibold text-2xl pb-2.5 text-ellipsis">{movie.title||movie.name}</h3>
+                                                            <p className="text-gray-200 text-xs pb-2.5">2022  |动作 冒险</p>
+                                                            <p className="text-gray-200 text-xs hidden leading-6 lg:line-clamp-3 mb-2.5">{movie.overview}</p>
+                                                            <div className="flex gap-3 mb-2.5">
+                                                                <div className="rounded-sm px-3 py-1 text-white text-xs bg-[#00000050]">喜剧</div>
+                                                                <div className="rounded-sm px-3 py-1 text-white text-xs bg-[#00000050]">犯罪</div>
+                                                            </div>
+                                                            <div className="flex gap-3">
+                                                                <a href={`/media/tmdb-${movieType}-${movie.id}-${movie.title || movie.name}`}
+                                                                    className="h-[43px] w-[43px] rounded-full bg-white text-gray-900 hover:bg-gray-200 duration-200 hover:scale-105 flex justify-center items-center">
+                                                                    <Icon icon={Icons.PLAY} className="text-lg"></Icon>
+                                                                </a>
+                                                                <a href="#" className="h-[43px] text-sm font-semibold text-white bg-[#00000050] border-[1px] rounded-full px-5 flex justify-center items-center duration-200 hover:scale-105">
+                                                                    More&nbsp;<span className="hidden lg:inline-block">Info&nbsp;</span> <span aria-hidden="true">→</span>
+                                                                </a>
+                                                            </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </SplideSlide>
+                                        ))
+                                    )}
+                                </SplideTrack>
+                            </Splide>
+                        </div>
+                        <div>
+                            <h2 className="text-2xl cursor-default font-bold text-white sm:text-3xl md:text-2xl mx-auto pb-6">
+                                {t("discover.popular")} ⭐️
+                            </h2>
+                            <Splide hasTrack={false} options={{
+                                rewind: true,
+                                drag: true,
+                                gap: ".5em",
+                                pagination: false,
+                                perPage: 5,
+                                breakpoints: {
+                                    768: {
+                                        perPage: 3
+                                    }
+                                }
+                            }} aria-label="React Splide Example">
+                                {renderArrow()}
+                                <SplideTrack>
+                                    {loading ? (
+                                        Array.from({ length: 6 }).map((temp, index) => (
+                                            <SplideSlide key={index}>
+                                                <div
+                                                    className="aspect-[2/3] animate-pulse bg-pill-background opacity-10 rounded-lg"></div>
+                                            </SplideSlide>
+                                        ))
+                                    ) : (
+                                        data?.popular.map((movie) => (
+                                            <SplideSlide key={movie.id}>
+                                                <a className="aspect-[2/3] transition-all duration-300 ease hover:scale-[0.99] block"
+                                                   href={`/media/tmdb-${movieType}-${movie.id}-${movie.title || movie.name}`}>
+                                                    <img
+                                                        src={movie.poster_path ? posterUrl(movie.poster_path) : "/placeholder-poster.png"}
+                                                        alt={movie.title || movie.name}
+                                                        className="rounded-lg" />
+                                                    <h3 className="text-[13.5px] font-semibold text-white overflow-x-hidden whitespace-nowrap overflow-ellipsis pt-1">{movie.title || movie.name}</h3>
+                                                </a>
+                                            </SplideSlide>
+                                        ))
+                                    )}
+                                </SplideTrack>
+                            </Splide>
+                        </div>
+                        <div>
+                            <h2 className="text-2xl cursor-default font-bold text-white sm:text-3xl md:text-2xl mx-auto pb-6">
+                                {t("discover.top_rated")}
+                            </h2>
+                            <Splide hasTrack={false} options={{
+                                rewind: true,
+                                drag: true,
+                                gap: "1em",
+                                pagination: false,
+                                perPage: 2
+                            }} aria-label="React Splide Example">
+                                {renderArrow()}
+                                <SplideTrack>
+                                    {loading ? (
+                                        Array.from({ length: 3 }).map((temp, index) => (
+                                            <SplideSlide key={index}>
+                                                <div
+                                                    className="aspect-[16/9] animate-pulse bg-pill-background opacity-10 rounded-lg"></div>
+                                            </SplideSlide>
+                                        ))
+                                    ) : (
+                                        data?.top_rated.map((movie) => (
+                                            <SplideSlide key={movie.id}>
+
+                                                <a className="aspect-[16/9] transition-all duration-300 ease hover:scale-[0.99] block"
+                                                   href={`/media/tmdb-${movieType}-${movie.id}-${movie.title || movie.name}`}>
+                                                    <img src={movie.backdrop_path?backdropUrl(movie.backdrop_path):"/placeholder-backdrop.png"}
+                                                         alt={movie.title || movie.name}
+                                                         className="rounded-lg" />
+                                                    <h3 className="text-[13.5px] font-semibold text-white overflow-x-hidden whitespace-nowrap overflow-ellipsis pt-1">{movie.title || movie.name}</h3>
+                                                </a>
+                                            </SplideSlide>
+                                        ))
+                                    )}
+                                </SplideTrack>
+                            </Splide>
+                        </div>
+                        <div>
+                            <Tab.Group>
+                                {/* 标题和面板控件 */}
+                                <div className="pb-6 flex justify-between items-center gap-5">
+                                    <h2 className="text-2xl cursor-default font-bold text-white sm:text-3xl md:text-2xl flex-shrink-0">
+                                        {t("discover.watch_providers")}
+                                    </h2>
+                                    <Tab.List className="flex gap-4 overflow-x-auto watch_providers">
+                                        {Object.keys(watchProviders).map(providerName => (
+                                            <Tab key={watchProviders[providerName]}
+                                                 className={({ selected }) =>
+                                                     [
+                                                         "rounded-full py-1 px-3 text-sm/6 font-semibold text-white focus:outline-none data-[hover]:bg-white/5 data-[focus]:outline-1 data-[focus]:outline-white flex-shrink-0",
+                                                         selected ? "bg-white/10 data-[hover]:bg-white/10" : ""
+                                                     ].join(" ")
+                                                 }>
+                                                {providerName}
+                                            </Tab>
+                                        ))}
+                                    </Tab.List>
+                                </div>
+
+                                {/* 内容面板 */}
+                                <Tab.Panels>
+                                    {
+                                        Object.keys(watchProviders).map(providerName => (
+                                            <Tab.Panel key={watchProviders[providerName]}>
+                                                <Splide hasTrack={false} options={{
+                                                    rewind: true,
+                                                    drag: true,
+                                                    gap: "1em",
+                                                    pagination: false,
+                                                    perPage: 5,
+                                                    breakpoints: {
+                                                        768: {
+                                                            perPage: 3
+                                                        }
+                                                    }
+                                                }} aria-label="React Splide Example">
+                                                    {renderArrow()}
+                                                    <SplideTrack>
+                                                        {loading ? (
+                                                            // 骨架屏
+                                                            Array.from({ length: 6 }).map((temp, index) => (
+                                                                <SplideSlide key={index}>
+                                                                    <div
+                                                                        className="aspect-[2/3] animate-pulse bg-pill-background opacity-10 rounded-lg"></div>
+                                                                </SplideSlide>
+                                                            ))
+                                                        ) : (
+                                                            data?.watch_providers[providerName as keyof Providers].map((movie) => (
+                                                                <SplideSlide key={movie.id}>
+                                                                    <a className="aspect-[2/3] transition-all duration-300 ease hover:scale-[0.99] block"
+                                                                       href={`/media/tmdb-${movieType}-${movie.id}-${movie.title || movie.name}`}>
+                                                                        <img src={movie.poster_path?posterUrl(movie.poster_path):'/placeholder-poster.png'}
+                                                                             alt={movie.title}
+                                                                             className="rounded-lg" />
+                                                                        <h3 className="text-[13.5px] font-semibold text-white overflow-x-hidden whitespace-nowrap overflow-ellipsis pt-1">{movie.title || movie.name}</h3>
+                                                                    </a>
+                                                                </SplideSlide>
+                                                            ))
+                                                        )
+                                                        }
+                                                    </SplideTrack>
+                                                </Splide>
+                                            </Tab.Panel>
+                                        ))
+                                    }
+                                </Tab.Panels>
+                            </Tab.Group>
+                        </div>
+                    </div>
+                    <div className="relative w-full md:w-[30%] space-y-8 md:pt-0 pt-8 md:min-h-full">
+                        <div className="md:absolute md:inset-0">
+                            <h2 className="text-2xl cursor-default font-bold text-white sm:text-3xl md:text-2xl mx-auto pb-6">
+                                {t("discover.upcoming")} 🍿
+                            </h2>
+                            <div className="h-full md:overflow-y-auto incoming">
+                                {loading ? (
+                                    Array.from({ length: 2 }).map((temp, index) => (
+                                        <div key={index} className="mb-4">
+                                            <div
+                                                className="aspect-[16/9] animate-pulse bg-pill-background opacity-10 rounded-lg mb-2"></div>
+                                            <div
+                                                className="h-4 w-2/3 animate-pulse bg-pill-background opacity-10 rounded-lg mb-2"></div>
+                                            <div
+                                                className="h-2 w-100 animate-pulse bg-pill-background opacity-10 rounded-lg mb-2"></div>
+                                            <div
+                                                className="h-2 w-100 animate-pulse bg-pill-background opacity-10 rounded-lg mb-2"></div>
+                                            <div
+                                                className="h-2 w-20 animate-pulse bg-pill-background opacity-10 rounded-lg mb-2"></div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    data?.upcoming.map((movie) => (
+                                        <a className="aspect-[16/9] transition-all duration-300 ease hover:scale-[0.99] block mb-4"
+                                           href={`/media/tmdb-${movieType}-${movie.id}-${movie.title || movie.name}`}>
+                                            <img src={movie.backdrop_path?backdropUrl(movie.backdrop_path):'/placeholder-backdrop.png'} alt={movie.title || movie.name}
+                                                 className="rounded-lg" />
+                                            <h3 className="text-sm font-bold text-white overflow-x-hidden whitespace-nowrap overflow-ellipsis py-1.5">{movie.title||movie.name}</h3>
+                                            <p className="line-clamp-3 text-gray-400 text-xs font-semibold">{movie.overview}</p>
+                                        </a>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </SubPageLayout>
+    );
+};
+
+
+export default React.memo(Discover);
+
+
+
+
+
+
+

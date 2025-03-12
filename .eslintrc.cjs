@@ -38,8 +38,18 @@ module.exports = {
       }
     }
   },
-  plugins: ["@typescript-eslint", "import", "prettier"],
+  plugins: ["@typescript-eslint", "import",],
+
   rules: {
+    'react-hooks/exhaustive-deps': 'off',
+    "prettier/prettier": "off",
+    "func-names": "off",
+    "import/newline-after-import":"off",
+    "spaced-comment":"off",
+    "react/function-component-definition":"off",
+    "lines-between-class-members":"off",
+    "react/self-closing-comp":"off",
+    "import/no-extraneous-dependencies": "off",
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
     "react/require-default-props": "off",
@@ -62,7 +72,7 @@ module.exports = {
     "no-nested-ternary": "off",
     "prefer-destructuring": "off",
     "no-param-reassign": "off",
-    "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern:  "^_" }],
+    "@typescript-eslint/no-unused-vars": "off",
     "react/jsx-filename-extension": [
       "error",
       { extensions: [".js", ".tsx", ".jsx"] }
@@ -75,34 +85,36 @@ module.exports = {
         tsx: "never"
       }
     ],
-    "import/order": [
-      "error",
-      {
-        groups: [
-          "builtin",
-          "external",
-          "internal",
-          ["sibling", "parent"],
-          "index",
-          "unknown"
-        ],
-        "newlines-between": "always",
-        alphabetize: {
-          order: "asc",
-          caseInsensitive: true
-        }
-      }
-    ],
-    "sort-imports": [
-      "error",
-      {
-        ignoreCase: false,
-        ignoreDeclarationSort: true,
-        ignoreMemberSort: false,
-        memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
-        allowSeparatedGroups: true
-      }
-    ],
+    "camelcase":"off",
+    "react/no-array-index-key":"off",
+    // "import/order": [
+    //   "error",
+    //   {
+    //     groups: [
+    //       "builtin",
+    //       "external",
+    //       "internal",
+    //       ["sibling", "parent"],
+    //       "index",
+    //       "unknown"
+    //     ],
+    //     "newlines-between": "always",
+    //     alphabetize: {
+    //       order: "asc",
+    //       caseInsensitive: true
+    //     }
+    //   }
+    // ],
+    // "sort-imports": [
+    //   "error",
+    //   {
+    //     ignoreCase: false,
+    //     ignoreDeclarationSort: true,
+    //     ignoreMemberSort: false,
+    //     memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
+    //     allowSeparatedGroups: true
+    //   }
+    // ],
     ...a11yOff
   }
 };

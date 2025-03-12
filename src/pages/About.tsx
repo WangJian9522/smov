@@ -69,23 +69,23 @@ export function AboutPage() {
             </Question>,
           ]}
         />
-        <div
-          style={{ display: "flex", justifyContent: "space-between" }}
-          className="pt-2 w-full"
-        >
-          <Button
-            className="py-px mt-8 box-content bg-buttons-secondary hover:bg-buttons-secondaryHover bg-opacity-90 text-buttons-secondaryText justify-center items-center"
-            onClick={() => navigate("/discover")}
-          >
-            Discover
-          </Button>
-          <Button
-            className="py-px mt-8 box-content bg-buttons-secondary hover:bg-buttons-secondaryHover bg-opacity-90 text-buttons-secondaryText justify-center items-center"
-            onClick={() => navigate("/support")}
-          >
-            Support
-          </Button>
-        </div>
+        {/* <div */}
+        {/*   style={{ display: "flex", justifyContent: "space-between" }} */}
+        {/*   className="pt-2 w-full" */}
+        {/* > */}
+        {/*   <Button */}
+        {/*     className="py-px mt-8 box-content bg-buttons-secondary hover:bg-buttons-secondaryHover bg-opacity-90 text-buttons-secondaryText justify-center items-center" */}
+        {/*     onClick={() => navigate("/discover")} */}
+        {/*   > */}
+        {/*     Discover */}
+        {/*   </Button> */}
+        {/*   <Button */}
+        {/*     className="py-px mt-8 box-content bg-buttons-secondary hover:bg-buttons-secondaryHover bg-opacity-90 text-buttons-secondaryText justify-center items-center" */}
+        {/*     onClick={() => navigate("/support")} */}
+        {/*   > */}
+        {/*     Support */}
+        {/*   </Button> */}
+        {/* </div> */}
       </ThinContainer>
     </SubPageLayout>
   );

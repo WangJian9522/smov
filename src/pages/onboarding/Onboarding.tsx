@@ -87,34 +87,34 @@ export function OnboardingPage() {
             </CardContent>
           </Card>
         </div>
-        {noProxies ? null : (
-          <>
-            <p className="text-center hidden md:block mt-12">
-              <Trans i18nKey="onboarding.start.options.default.text">
-                <br />
-                <a
-                  onClick={skipModal.show}
-                  type="button"
-                  className="text-onboarding-link hover:opacity-75 cursor-pointer"
-                />
-              </Trans>
-            </p>
-            <div className=" max-w-[300px] mx-auto md:hidden mt-12 ">
-              <Button
-                className="!text-type-text !bg-opacity-50"
-                theme="secondary"
-                onClick={skipModal.show}
-              >
-                <span>
-                  <Trans i18nKey="onboarding.start.options.default.text">
-                    <span />
-                    <span />
-                  </Trans>
-                </span>
-              </Button>
-            </div>
-          </>
-        )}
+        {/* {noProxies ? null : ( */}
+        {/*   <> */}
+        {/*     <p className="text-center hidden md:block mt-12"> */}
+        {/*       <Trans i18nKey="onboarding.start.options.default.text"> */}
+        {/*         <br /> */}
+        {/*         <a */}
+        {/*           onClick={skipModal.show} */}
+        {/*           type="button" */}
+        {/*           className="text-onboarding-link hover:opacity-75 cursor-pointer" */}
+        {/*         /> */}
+        {/*       </Trans> */}
+        {/*     </p> */}
+        {/*     <div className=" max-w-[300px] mx-auto md:hidden mt-12 "> */}
+        {/*       <Button */}
+        {/*         className="!text-type-text !bg-opacity-50" */}
+        {/*         theme="secondary" */}
+        {/*         onClick={skipModal.show} */}
+        {/*       > */}
+        {/*         <span> */}
+        {/*           <Trans i18nKey="onboarding.start.options.default.text"> */}
+        {/*             <span /> */}
+        {/*             <span /> */}
+        {/*           </Trans> */}
+        {/*         </span> */}
+        {/*       </Button> */}
+        {/*     </div> */}
+        {/*   </> */}
+        {/* )} */}
       </CenterContainer>
     </MinimalPageLayout>
   );

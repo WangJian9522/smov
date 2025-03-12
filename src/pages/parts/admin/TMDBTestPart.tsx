@@ -42,7 +42,7 @@ export function TMDBTestPart() {
     }
 
     try {
-      await getMediaDetails("556574", TMDBContentTypes.MOVIE);
+      await getMediaDetails("556574", TMDBContentTypes.MOVIE, 'en-US');
     } catch (err) {
       return setStatus({
         hasTested: true,

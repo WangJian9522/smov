@@ -1,6 +1,6 @@
 interface StoreVersion<A> {
   version: number;
-  migrate?(data: A): any;
+  migrate?(data: A, language:string): any;
   create?: () => A;
 }
 interface StoreRet<T> {
@@ -26,7 +26,7 @@ interface InternalStoreData {
 const storeCallbacks: Record<string, ((data: any) => void)[]> = {};
 const stores: Record<string, [StoreRet<any>, InternalStoreData]> = {};
 
-export async function initializeOldStores() {
+export async function initializeOldStores(language: string,) {
   // migrate all stores
   for (const [store, internal] of Object.values(stores)) {
     const versions = internal.versions.sort((a, b) => a.version - b.version);
@@ -49,7 +49,7 @@ export async function initializeOldStores() {
             `BACKUP-v${version.version}-${internal.key}`,
             JSON.stringify(mostRecentData),
           );
-          mostRecentData = await version.migrate(mostRecentData);
+          mostRecentData = await version.migrate(mostRecentData, language);
         }
       }
     } catch (err) {

@@ -14,6 +14,7 @@ import { WatchedStoreData } from "../types";
 async function migrateId(
   id: string,
   type: MWMediaType,
+  language: string,
 ): Promise<string | undefined> {
   const meta = await getLegacyMetaFromId(type, id);
 
@@ -23,7 +24,7 @@ async function migrateId(
 
   // movies always have an imdb id on tmdb
   if (imdbId && type === MWMediaType.MOVIE) {
-    const movieId = await getMovieFromExternalId(imdbId);
+    const movieId = await getMovieFromExternalId(imdbId, language);
     if (movieId) return movieId;
   }
 
@@ -32,10 +33,10 @@ async function migrateId(
   }
 }
 
-export async function migrateV2Bookmarks(old: BookmarkStoreData) {
+export async function migrateV2Bookmarks(old: BookmarkStoreData, language: string,) {
   const updatedBookmarks = old.bookmarks.map(async (item) => ({
     ...item,
-    id: await migrateId(item.id, item.type).catch(() => undefined),
+    id: await migrateId(item.id, item.type, language).catch(() => undefined),
   }));
 
   return {
@@ -45,6 +46,7 @@ export async function migrateV2Bookmarks(old: BookmarkStoreData) {
 
 export async function migrateV3Videos(
   old: WatchedStoreData,
+  language: string,
 ): Promise<WatchedStoreData> {
   const updatedItems = await Promise.all(
     old.items.map(async (progress) => {
@@ -52,6 +54,7 @@ export async function migrateV3Videos(
         const migratedId = await migrateId(
           progress.item.meta.id,
           progress.item.meta.type,
+            language
         );
 
         if (!migratedId) return null;
@@ -63,6 +66,7 @@ export async function migrateV3Videos(
           const details = await getMediaDetails(
             migratedId,
             TMDBContentTypes.TV,
+              language
           );
 
           const season = details.seasons.find(
@@ -70,7 +74,7 @@ export async function migrateV3Videos(
           );
           if (!season) return null;
 
-          const episodes = await getEpisodes(migratedId, season.season_number);
+          const episodes = await getEpisodes(migratedId, season.season_number, language);
           const episode = episodes.find(
             (v) => v.episode_number === series.episode,
           );

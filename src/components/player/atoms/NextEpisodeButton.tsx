@@ -50,10 +50,11 @@ function useSeasons(
   mediaId: string | undefined,
   isLastEpisode: boolean = false,
 ) {
+  const { i18n } = useTranslation();
   const state = useAsync(async () => {
     if (isLastEpisode) {
       if (!mediaId) return null;
-      const data = await getMetaFromId(MWMediaType.SERIES, mediaId);
+      const data = await getMetaFromId(MWMediaType.SERIES, mediaId, i18n.language);
       if (data?.meta.type !== MWMediaType.SERIES) return null;
       return data.meta.seasons;
     }
@@ -66,12 +67,14 @@ function useNextSeasonEpisode(
   nextSeason: MWSeasonMeta | undefined,
   mediaId: string | undefined,
 ) {
+  const { i18n } = useTranslation();
   const state = useAsync(async () => {
     if (nextSeason) {
       if (!mediaId) return null;
       const data = await getMetaFromId(
         MWMediaType.SERIES,
         mediaId,
+        i18n.language,
         nextSeason?.id,
       );
       if (data?.meta.type !== MWMediaType.SERIES) return null;

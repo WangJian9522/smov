@@ -302,7 +302,7 @@ export function SettingsPage() {
             enableAutoplay={state.enableAutoplay.state}
             setEnableAutoplay={state.enableAutoplay.set}
             sourceOrder={availableSources}
-            setSourceOrder={state.sourceOrder.set}
+            // setSourceOrder={state.sourceOrder.set}
           />
         </div>
         <div id="settings-appearance" className="mt-48">
@@ -319,12 +319,13 @@ export function SettingsPage() {
           />
         </div>
         <div id="settings-connection" className="mt-48">
-          <ConnectionsPart
-            backendUrl={state.backendUrl.state}
-            setBackendUrl={state.backendUrl.set}
-            proxyUrls={state.proxyUrls.state}
-            setProxyUrls={state.proxyUrls.set}
-          />
+          {/* <ConnectionsPart */}
+          {/*   backendUrl={state.backendUrl.state} */}
+          {/*   setBackendUrl={state.backendUrl.set} */}
+          {/*   proxyUrls={state.proxyUrls.state} */}
+          {/*   setProxyUrls={state.proxyUrls.set} */}
+          {/* /> */}
+          <ConnectionsPart />
         </div>
       </SettingsLayout>
       <Transition

@@ -68,9 +68,10 @@ export function formatTMDBMetaResult(
 export async function getMetaFromId(
   type: MWMediaType,
   id: string,
+  language: string,
   seasonId?: string,
 ): Promise<DetailedMeta | null> {
-  const details = await getMediaDetails(id, mediaTypeToTMDB(type));
+  const details = await getMediaDetails(id, mediaTypeToTMDB(type),language);
 
   if (!details) return null;
 
@@ -90,6 +91,7 @@ export async function getMetaFromId(
       const episodes = await getEpisodes(
         details.id.toString(),
         selectedSeason.season_number,
+          language,
       );
 
       seasonData = {
@@ -176,6 +178,7 @@ export function isLegacyMediaType(url: string): boolean {
 
 export async function convertLegacyUrl(
   url: string,
+  language: string,
 ): Promise<string | undefined> {
   if (!isLegacyUrl(url)) return undefined;
 
@@ -187,7 +190,7 @@ export async function convertLegacyUrl(
     .join("");
 
   if (isLegacyMediaType(url)) {
-    const details = await getMediaDetails(id, TMDBContentTypes.TV);
+    const details = await getMediaDetails(id, TMDBContentTypes.TV,language);
     return `/media/${TMDBIdToUrlId(
       MWMediaType.SERIES,
       details.id.toString(),
@@ -204,7 +207,7 @@ export async function convertLegacyUrl(
 
   // movies always have an imdb id on tmdb
   if (imdbId && mediaType === MWMediaType.MOVIE) {
-    const movieId = await getMovieFromExternalId(imdbId);
+    const movieId = await getMovieFromExternalId(imdbId, language);
     if (movieId) {
       return `/media/${TMDBIdToUrlId(mediaType, movieId, meta.meta.title)}`;
     }
