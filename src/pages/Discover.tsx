@@ -53,7 +53,10 @@ interface Data {
     upcoming: Array<Movie>,
     watch_providers: Providers,
 }
-
+interface Genre {
+    id: number;
+    name: string;
+}
 export const Discover: React.FC = () => {
     const { t, i18n } = useTranslation();
     // {t("settings.account.admin.title")}
@@ -65,14 +68,16 @@ export const Discover: React.FC = () => {
         "popular": `movie/popular`,
         "top_rated": `movie/top_rated`,
         "upcoming": `movie/upcoming`,
-        "watch_providers": (provider_code: string) => `discover/movie?with_watch_providers=${provider_code}&watch_region=US`
+        "watch_providers": (provider_code: string) => `discover/movie?with_watch_providers=${provider_code}&watch_region=US`,
+        "genre_list": 'https://api.themoviedb.org/3/genre/movie/list'
     };
     const seriesUrls = {
         "now_playing": `tv/airing_today`,
         "popular": `tv/popular`,
         "top_rated": `tv/top_rated`,
         "upcoming": `tv/on_the_air`,
-        "watch_providers": (provider_code: string) => `discover/tv?with_watch_providers=${provider_code}&watch_region=US`
+        "watch_providers": (provider_code: string) => `discover/tv?with_watch_providers=${provider_code}&watch_region=US`,
+        "genre_list": 'https://api.themoviedb.org/3/genre/tv/list'
     };
     const watchProviders: WatchProviders = {
         Netflix: 8,
@@ -84,7 +89,9 @@ export const Discover: React.FC = () => {
     };
     const posterUrl = (uri: string) => `https://image.tmdb.org/t/p/w440_and_h660_face${uri}`;
     const backdropUrl = (uri: string) => `https://image.tmdb.org/t/p/original${uri}`;
+
     const [data, setData] = useState<Data>();
+    const [genres, setGenres] = useState<any>();
     const [loading, setLoading] = useState<boolean>(true);
     // 使用 useRef 来确保请求只在首次加载时进行
     const didFetch = useRef(false);
@@ -94,7 +101,7 @@ export const Discover: React.FC = () => {
         return get<any>(url, {
             api_key: conf().TMDB_READ_API_KEY,
             language: i18nLang
-        }).then(res => res.results);
+        });
     };
     // 页面渲染后一次性完成所有请求
     useEffect(() => {
@@ -120,16 +127,23 @@ export const Discover: React.FC = () => {
                 }
             });
             try {
-                const results = await Promise.all(tempReq.map(req => req.req));
+                const respList = await Promise.all(tempReq.map(req => req.req));
                 const fuck: Array<any> = [];
+                const gl: Record<number, string> = {};
                 const combinedData = tempReq.reduce((acc, item, index) => {
                     if (item.provName) {
                         acc[item.name] = acc[item.name] || {};
-                        acc[item.name][item.provName] = results[index];
-                    } else {
-                        acc[item.name] = results[index];
+                        acc[item.name][item.provName] = respList[index].results;
+                        fuck.push(...respList[index].results);
+                    } else if (item.name==="genre_list"){
+                        respList[index].genres.forEach((genre:Genre)=>{
+                            gl[genre?.id] = genre.name
+                        })
+                        setGenres(gl)
+                    }else{
+                        acc[item.name] = respList[index].results;
+                        fuck.push(...respList[index].results);
                     }
-                    fuck.push(...results[index]);
                     return acc;
                 }, {});
                 setFlatData(fuck);
@@ -223,7 +237,7 @@ export const Discover: React.FC = () => {
                            } : undefined}
                            className={[
                                "flex items-center space-x-2 rounded-full px-4 text-white py-2",
-                               movieType === "movie" ? "bg-pill-background bg-opacity-50 cursor-not-allowed" : "hover:bg-pill-backgroundHover transition-[background,transform] duration-100 hover:scale-105"
+                               movieType === "movie" ? "bg-white/10 cursor-not-allowed" : "hover:bg-white/10 transition-[background,transform] duration-100 hover:scale-105"
                            ].join(" ")}>
                             {t("discover.movie")}
                         </a>
@@ -233,16 +247,13 @@ export const Discover: React.FC = () => {
                            } : undefined}
                            className={[
                                "flex items-center space-x-2 rounded-full px-4 text-white py-2",
-                               movieType === "tv" ? "bg-pill-background bg-opacity-50 cursor-not-allowed" : "hover:bg-pill-backgroundHover transition-[background,transform] duration-100 hover:scale-105"
+                               movieType === "tv" ? "bg-white/10 cursor-not-allowed" : "hover:bg-white/10 transition-[background,transform] duration-100 hover:scale-105"
                            ].join(" ")}>
                             {t("discover.series")}
                         </a>
                     </div>
-                    <button type="button"
-                            onClick={() => navigate(
-                                randomMovie()
-                            )}
-                            className="flex items-center space-x-2 rounded-full px-4 text-white py-2 bg-pill-background bg-opacity-50 hover:bg-pill-backgroundHover transition-[background,transform] duration-100 hover:scale-105 dice-btn">
+                    <button type="button" onClick={() => navigate(randomMovie())}
+                            className="flex items-center space-x-2 rounded-full px-4 text-white py-2 bg-white/10 duration-100 hover:scale-105 dice-btn">
                         <div className="flex items-center">
                             <div>{t("discover.random_watch")}</div>
                             <img src="/lightbar-images/dice.svg" alt="Small Image" className="ml-3 dice-image" />
@@ -285,13 +296,15 @@ export const Discover: React.FC = () => {
                                                         <div className="w-[64%] py-6 sm:py-8 pr-5 flex items-end">
                                                             <div>
                                                             <h3 className="text-gray-100 font-semibold text-2xl pb-2.5 text-ellipsis">{movie.title||movie.name}</h3>
-                                                            <p className="text-gray-200 text-xs pb-2.5">2022  |动作 冒险</p>
+                                                            <p className="text-gray-200 text-xs pb-2.5">2022  |IMDB {movie.vote_average}/10</p>
                                                             <p className="text-gray-200 text-xs hidden leading-6 lg:line-clamp-3 mb-2.5">{movie.overview}</p>
                                                             <div className="flex gap-3 mb-2.5">
-                                                                <div className="rounded-sm px-3 py-1 text-white text-xs bg-[#00000050]">喜剧</div>
-                                                                <div className="rounded-sm px-3 py-1 text-white text-xs bg-[#00000050]">犯罪</div>
+                                                                {movie.genre_ids.slice(0, 2).map(genre_id=>(
+                                                                    <div
+                                                                        className="rounded-sm px-3 py-1 text-white text-xs bg-[#00000050]">{genres[genre_id]}</div>
+                                                                ))}
                                                             </div>
-                                                            <div className="flex gap-3">
+                                                                <div className="flex gap-3">
                                                                 <a href={`/media/tmdb-${movieType}-${movie.id}-${movie.title || movie.name}`}
                                                                     className="h-[43px] w-[43px] rounded-full bg-white text-gray-900 hover:bg-gray-200 duration-200 hover:scale-105 flex justify-center items-center">
                                                                     <Icon icon={Icons.PLAY} className="text-lg"></Icon>
@@ -402,7 +415,7 @@ export const Discover: React.FC = () => {
                                                  className={({ selected }) =>
                                                      [
                                                          "rounded-full py-1 px-3 text-sm/6 font-semibold text-white focus:outline-none data-[hover]:bg-white/5 data-[focus]:outline-1 data-[focus]:outline-white flex-shrink-0",
-                                                         selected ? "bg-white/10 data-[hover]:bg-white/10" : ""
+                                                         selected ? "bg-white/10 data-[hover]:bg-white/10" : "hover:bg-white/10 transition-[background,transform] duration-100"
                                                      ].join(" ")
                                                  }>
                                                 {providerName}
