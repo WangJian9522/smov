@@ -1,10 +1,4 @@
 {
-  "installCommand": "pnpm install --no-frozen-lockfile",
-  "build": {
-    "env": {
-      "VITE_POSTCSS_DISABLE": "true"
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
