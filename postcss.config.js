@@ -1,6 +1,6 @@
-module.exports = ({ env }) => ({
-  plugins: env === 'production' ? { tailwindcss: {}, autoprefixer: {} } : {},
-});
+module.exports = {
+  plugins: process.env.VITE_POSTCSS_DISABLE ? {} : { tailwindcss: {}, autoprefixer: {} },
+};
 
 
 module.exports = {
