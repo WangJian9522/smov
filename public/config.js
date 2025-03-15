@@ -1,7 +1,7 @@
 window.__CONFIG__ = {
   // The URL for the CORS proxy, the URL must NOT end with a slash!
   // If not specified, the onboarding will not allow a "default setup". The user will have to use the extension or set up a proxy themselves
-  VITE_CORS_PROXY_URL: "https://tangerine-bubblegum-a7047b.netlify.app",
+  VITE_CORS_PROXY_URL: "https://provider.tubiii.com,https://provider.indielens.org",
 
   // The backend URL to communicate with
   // VITE_BACKEND_URL: "https://server.vidbinge.com",
@@ -11,7 +11,7 @@ window.__CONFIG__ = {
   VITE_TMDB_READ_API_KEY: "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1NzlkZWYyZDY5ZWFlNDk4ZjJiOTI4MTgyNDdjM2ViMCIsInN1YiI6IjY2MjdmMGJlNjJmMzM1MDE0YmQ4NTFmMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.h3KpPvkiaz8uNz1bntAKqsPrxG_4UUWaY3kYME6N6m8",
 
   // 这是 DMCA 页面上的 DMCA 电子邮件。如果存在此配置值，则会创建一个新页面并链接到页脚中，其中会提到如何处理 DMCA 删除请求。如果配置值为空，则页面将不存在。
-  VITE_DMCA_EMAIL: "ss@qq.com",
+  VITE_DMCA_EMAIL: "dmca@qq.com",
 
   // 该应用程序有两种路由模式：哈希路由器和历史路由器。
   // 哈希路由器意味着每个页面都与哈希链接在一起，如下所示：https://example.com/#/browse。
@@ -30,11 +30,11 @@ window.__CONFIG__ = {
   VITE_GA_ID: "",
 
   // 是否启用OpenSearch，这允许用户将搜索引擎添加到浏览器中。启用时还必须设置VITE_APP_DOMAIN。
-  VITE_OPENSEARCH_ENABLED: false,
+  VITE_OPENSEARCH_ENABLED: true,
 
   // 应用所在的域。仅当VITE_OPENSEARCH_ENABLED启用该选项时才需要。
   // 该值必须包含协议（HTTP/HTTPS），但不能以斜杠结尾。
-  VITE_APP_DOMAIN: "",
+  VITE_APP_DOMAIN: "https://tubiii.com",
 
   // chrome extension
   VITE_ONBOARDING_CHROME_EXTENSION_INSTALL_LINK: "https://docs.undi.rest/chrome-extension",
@@ -54,5 +54,29 @@ window.__CONFIG__ = {
   VITE_HAS_ONBOARDING: false,
 
   // 是否允许使用主机提供的代理的用户自动播放。
-  VITE_ALLOW_AUTOPLAY: true
+  VITE_ALLOW_AUTOPLAY: true,
+
+  // 站点名
+  VITE_SITE_NAME: "Tubiii",
 };
+if (location.host === "tubiii.com"){
+  window.__CONFIG__.VITE_SITE_NAME = 'Tubiii'
+  window.__CONFIG__.VITE_CORS_PROXY_URL = 'https://provider.tubiii.com'
+  window.__CONFIG__.VITE_APP_DOMAIN = "https://tubiii.com"
+
+  window.__CONFIG__.VITE_GA_ID = "google analysis"
+
+  window.__CONFIG__.VITE_DMCA_EMAIL = "dmca@tubiii.com"
+  window.__CONFIG__.VITE_DISALLOWED_IDS = ""
+}else if (location.host === "indielens.org"){
+  window.__CONFIG__.VITE_SITE_NAME = 'Indie-lens'
+  window.__CONFIG__.VITE_CORS_PROXY_URL = 'https://provider.indielens.com'
+  window.__CONFIG__.VITE_APP_DOMAIN = "https://indielens.com"
+
+  window.__CONFIG__.VITE_GA_ID = "google analysis"
+
+  window.__CONFIG__.VITE_DMCA_EMAIL = "dmca@indielens.com"
+  window.__CONFIG__.VITE_DISALLOWED_IDS = ""
+}else {
+
+}

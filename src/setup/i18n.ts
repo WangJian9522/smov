@@ -3,7 +3,7 @@ import { initReactI18next } from "react-i18next";
 
 import { locales } from "@/assets/languages";
 import { getLocaleInfo } from "@/utils/language";
-
+import { conf } from "@/setup/config";
 // Languages
 const langCodes = Object.keys(locales);
 const resources = Object.fromEntries(
@@ -14,6 +14,7 @@ i18n.use(initReactI18next).init({
   resources,
   interpolation: {
     escapeValue: false, // not needed for react as it escapes by default
+    defaultVariables: { site_name: conf().SITE_NAME },
   },
 });
 

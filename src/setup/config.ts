@@ -13,6 +13,7 @@ import {
 
 interface Config {
   APP_VERSION: string;
+  SITE_NAME: string;
   GITHUB_LINK: string;
   DISCORD_LINK: string;
   DMCA_EMAIL: string;
@@ -33,6 +34,7 @@ interface Config {
 
 export interface RuntimeConfig {
   APP_VERSION: string;
+  SITE_NAME: string | null;
   GITHUB_LINK: string;
   DISCORD_LINK: string;
   DMCA_EMAIL: string | null;
@@ -54,6 +56,7 @@ export interface RuntimeConfig {
 const env: Record<keyof Config, undefined | string> = {
   TMDB_READ_API_KEY: import.meta.env.VITE_TMDB_READ_API_KEY,
   APP_VERSION: undefined,
+  SITE_NAME: import.meta.env.VITE_SITE_NAME,
   GITHUB_LINK: undefined,
   DISCORD_LINK: undefined,
   TWITTER_LINK: undefined,
@@ -99,6 +102,7 @@ export function conf(): RuntimeConfig {
     GITHUB_LINK,
     DISCORD_LINK,
     TWITTER_LINK,
+    SITE_NAME: getKey("SITE_NAME"),
     DMCA_EMAIL: getKey("DMCA_EMAIL"),
     ONBOARDING_CHROME_EXTENSION_INSTALL_LINK: getKey(
       "ONBOARDING_CHROME_EXTENSION_INSTALL_LINK",
