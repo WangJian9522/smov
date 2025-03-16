@@ -1,7 +1,7 @@
 window.__CONFIG__ = {
   // The URL for the CORS proxy, the URL must NOT end with a slash!
   // If not specified, the onboarding will not allow a "default setup". The user will have to use the extension or set up a proxy themselves
-  VITE_CORS_PROXY_URL: "https://provider.tubiii.com,https://provider.indielens.org",
+  VITE_CORS_PROXY_URL: "https://provider.tubiii.com",
 
   // The backend URL to communicate with
   // VITE_BACKEND_URL: "https://server.vidbinge.com",
@@ -51,7 +51,7 @@ window.__CONFIG__ = {
   VITE_TURNSTILE_KEY: "",
 
   // 如果您希望用户在开始观看之前收到入门屏幕提示，请启用此功能。
-  VITE_HAS_ONBOARDING: false,
+  VITE_HAS_ONBOARDING: true,
 
   // 是否允许使用主机提供的代理的用户自动播放。
   VITE_ALLOW_AUTOPLAY: true,
@@ -68,14 +68,15 @@ if (location.host === "tubiii.com"){
 
   window.__CONFIG__.VITE_DMCA_EMAIL = "dmca@tubiii.com"
   window.__CONFIG__.VITE_DISALLOWED_IDS = ""
+
 }else if (location.host === "indielens.org"){
   window.__CONFIG__.VITE_SITE_NAME = 'Indie-lens'
-  window.__CONFIG__.VITE_CORS_PROXY_URL = 'https://provider.indielens.com'
-  window.__CONFIG__.VITE_APP_DOMAIN = "https://indielens.com"
+  window.__CONFIG__.VITE_CORS_PROXY_URL = 'https://provider.indielens.org'
+  window.__CONFIG__.VITE_APP_DOMAIN = "https://indielens.org"
 
   window.__CONFIG__.VITE_GA_ID = "google analysis"
 
-  window.__CONFIG__.VITE_DMCA_EMAIL = "dmca@indielens.com"
+  window.__CONFIG__.VITE_DMCA_EMAIL = "dmca@indielens.org"
   window.__CONFIG__.VITE_DISALLOWED_IDS = ""
 }else {
 

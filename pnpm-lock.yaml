@@ -40,8 +40,8 @@ importers:
         specifier: ^0.7.2
         version: 0.7.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@movie-web/providers':
-        specifier: github:Wangjian9522/smov-providers
-        version: https://codeload.github.com/Wangjian9522/smov-providers/tar.gz/a4f06fd4bd1233d0b17206f764c9d5d2f2dc2563
+        specifier: github:Wangjian9522/smov-providers#production
+        version: https://codeload.github.com/Wangjian9522/smov-providers/tar.gz/07131978b2b5f28bd327e2844e009ca278ca2ba7
       '@noble/hashes':
         specifier: ^1.5.0
         version: 1.5.0
@@ -1208,8 +1208,8 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
-  '@movie-web/providers@https://codeload.github.com/Wangjian9522/smov-providers/tar.gz/a4f06fd4bd1233d0b17206f764c9d5d2f2dc2563':
-    resolution: {tarball: https://codeload.github.com/Wangjian9522/smov-providers/tar.gz/a4f06fd4bd1233d0b17206f764c9d5d2f2dc2563}
+  '@movie-web/providers@https://codeload.github.com/Wangjian9522/smov-providers/tar.gz/07131978b2b5f28bd327e2844e009ca278ca2ba7':
+    resolution: {tarball: https://codeload.github.com/Wangjian9522/smov-providers/tar.gz/07131978b2b5f28bd327e2844e009ca278ca2ba7}
     version: 2.3.0
 
   '@noble/hashes@1.5.0':
@@ -5308,7 +5308,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@movie-web/providers@https://codeload.github.com/Wangjian9522/smov-providers/tar.gz/a4f06fd4bd1233d0b17206f764c9d5d2f2dc2563':
+  '@movie-web/providers@https://codeload.github.com/Wangjian9522/smov-providers/tar.gz/07131978b2b5f28bd327e2844e009ca278ca2ba7':
     dependencies:
       cheerio: 1.0.0-rc.12
       cookie: 0.6.0

@@ -76,45 +76,46 @@ export function OnboardingPage() {
             <span className="text-xs uppercase font-bold">or</span>
             <VerticalLine />
           </div>
-          <Card onClick={() => navigate("/onboarding/proxy")}>
-            <CardContent
-              colorClass="!text-onboarding-good"
-              title={t("onboarding.start.options.proxy.title")}
-              subtitle={t("onboarding.start.options.proxy.quality")}
-              description={t("onboarding.start.options.proxy.description")}
-            >
-              <Link>{t("onboarding.start.options.proxy.action")}</Link>
-            </CardContent>
-          </Card>
+          {/* <Card onClick={() => navigate("/onboarding/proxy")}> */}
+          {/*   <CardContent */}
+          {/*     colorClass="!text-onboarding-good" */}
+          {/*     title={t("onboarding.start.options.proxy.title")} */}
+          {/*     subtitle={t("onboarding.start.options.proxy.quality")} */}
+          {/*     description={t("onboarding.start.options.proxy.description")} */}
+          {/*   > */}
+          {/*     <Link>{t("onboarding.start.options.proxy.action")}</Link> */}
+          {/*   </CardContent> */}
+          {/* </Card> */}
         </div>
-        {/* {noProxies ? null : ( */}
-        {/*   <> */}
-        {/*     <p className="text-center hidden md:block mt-12"> */}
-        {/*       <Trans i18nKey="onboarding.start.options.default.text"> */}
-        {/*         <br /> */}
-        {/*         <a */}
-        {/*           onClick={skipModal.show} */}
-        {/*           type="button" */}
-        {/*           className="text-onboarding-link hover:opacity-75 cursor-pointer" */}
-        {/*         /> */}
-        {/*       </Trans> */}
-        {/*     </p> */}
-        {/*     <div className=" max-w-[300px] mx-auto md:hidden mt-12 "> */}
-        {/*       <Button */}
-        {/*         className="!text-type-text !bg-opacity-50" */}
-        {/*         theme="secondary" */}
-        {/*         onClick={skipModal.show} */}
-        {/*       > */}
-        {/*         <span> */}
-        {/*           <Trans i18nKey="onboarding.start.options.default.text"> */}
-        {/*             <span /> */}
-        {/*             <span /> */}
-        {/*           </Trans> */}
-        {/*         </span> */}
-        {/*       </Button> */}
-        {/*     </div> */}
-        {/*   </> */}
-        {/* )} */}
+        {noProxies ? null : (
+          <>
+            <p className="text-center mt-12">
+            {/* <p className="text-center hidden md:block mt-12"> */}
+              <Trans i18nKey="onboarding.start.options.default.text">
+                <br />
+                <a
+                  onClick={skipModal.show}
+                  type="button"
+                  className="text-onboarding-link hover:opacity-75 cursor-pointer"
+                />
+              </Trans>
+            </p>
+            {/* <div className=" max-w-[300px] mx-auto md:hidden mt-12 "> */}
+            {/*   <Button */}
+            {/*     className="!text-type-text !bg-opacity-50" */}
+            {/*     theme="secondary" */}
+            {/*     onClick={skipModal.show} */}
+            {/*   > */}
+            {/*     <span> */}
+            {/*       <Trans i18nKey="onboarding.start.options.default.text"> */}
+            {/*         <span /> */}
+            {/*         <span /> */}
+            {/*       </Trans> */}
+            {/*     </span> */}
+            {/*   </Button> */}
+            {/* </div> */}
+          </>
+        )}
       </CenterContainer>
     </MinimalPageLayout>
   );

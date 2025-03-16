@@ -152,6 +152,7 @@ function App() {
           ) : null}
           {/* Support page */}
           {/* <Route path="/support" element={<SupportPage />} /> */}
+          {/* 似乎指向原作者git */}
           {/* <Route path="/jip" element={<JipPage />} /> */}
           {/* Discover page */}
           <Route path="/discover" element={<Discover />} />

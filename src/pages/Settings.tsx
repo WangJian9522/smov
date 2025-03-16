@@ -290,9 +290,9 @@ export function SettingsPage() {
             <RegisterCalloutPart />
           )}
         </div>
-        <div className="mt-10">
-          <AdminPanelPart />
-        </div>
+        {/* <div className="mt-10"> */}
+        {/*   <AdminPanelPart /> */}
+        {/* </div> */}
         <div id="settings-preferences" className="mt-48">
           <PreferencesPart
             language={state.appLanguage.state}

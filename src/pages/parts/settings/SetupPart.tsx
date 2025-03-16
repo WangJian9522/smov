@@ -182,9 +182,9 @@ export function SetupPart() {
           <SetupCheckList status={setupStates.extension}>
             {t("settings.connections.setup.items.extension")}
           </SetupCheckList>
-          <SetupCheckList status={setupStates.proxy}>
-            {t("settings.connections.setup.items.proxy")}
-          </SetupCheckList>
+          {/* <SetupCheckList status={setupStates.proxy}> */}
+          {/*   {t("settings.connections.setup.items.proxy")} */}
+          {/* </SetupCheckList> */}
           <SetupCheckList
             grey
             highlight={globalState === "unset"}
