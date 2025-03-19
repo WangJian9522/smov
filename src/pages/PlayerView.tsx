@@ -1,10 +1,10 @@
 import { RunOutput } from "@movie-web/providers";
 import { useCallback, useEffect, useState } from "react";
 import {
-  Navigate,
-  useLocation,
-  useNavigate,
-  useParams,
+    Navigate,
+    useLocation,
+    useNavigate,
+    useParams
 } from "react-router-dom";
 import { useAsync } from "react-use";
 
@@ -25,116 +25,117 @@ import { needsOnboarding } from "@/utils/onboarding";
 import { parseTimestamp } from "@/utils/timestamp";
 
 export function RealPlayerView() {
-  const navigate = useNavigate();
-  const params = useParams<{
-    media: string;
-    episode?: string;
-    season?: string;
-  }>();
-  const [errorData, setErrorData] = useState<{
-    sources: Record<string, ScrapingSegment>;
-    sourceOrder: ScrapingItems[];
-  } | null>(null);
-  const [startAtParam] = useQueryParam("t");
-  const {
-    status,
-    playMedia,
-    reset,
-    setScrapeNotFound,
-    shouldStartFromBeginning,
-    setShouldStartFromBeginning,
-  } = usePlayer();
-  const { setPlayerMeta, scrapeMedia } = usePlayerMeta();
-  const backUrl = useLastNonPlayerLink();
+    const navigate = useNavigate();
+    const params = useParams<{
+        media: string;
+        episode?: string;
+        season?: string;
+    }>();
+    const [errorData, setErrorData] = useState<{
+        sources: Record<string, ScrapingSegment>;
+        sourceOrder: ScrapingItems[];
+    } | null>(null);
+    const [startAtParam] = useQueryParam("t");
+    const {
+        status,
+        playMedia,
+        reset,
+        setScrapeNotFound,
+        shouldStartFromBeginning,
+        setShouldStartFromBeginning
+    } = usePlayer();
+    const { setPlayerMeta, scrapeMedia } = usePlayerMeta();
+    const backUrl = useLastNonPlayerLink();
 
-  const paramsData = JSON.stringify({
-    media: params.media,
-    season: params.season,
-    episode: params.episode,
-  });
-  useEffect(() => {
-    reset();
-  }, [paramsData, reset]);
+    const paramsData = JSON.stringify({
+        media: params.media,
+        season: params.season,
+        episode: params.episode
+    });
 
-  const metaChange = useCallback(
-    (meta: PlayerMeta) => {
-      if (meta?.type === "show")
-        navigate(
-          `/media/${params.media}/${meta.season?.tmdbId}/${meta.episode?.tmdbId}`,
-        );
-      else navigate(`/media/${params.media}`);
-    },
-    [navigate, params],
-  );
+    useEffect(() => {
+        reset();
+    }, [paramsData, reset]);
 
-  const playAfterScrape = useCallback(
-    (out: RunOutput | null) => {
-      if (!out) return;
+    const metaChange = useCallback(
+        (meta: PlayerMeta) => {
+            if (meta?.type === "show")
+                navigate(
+                    `/media/${params.media}/${meta.season?.tmdbId}/${meta.episode?.tmdbId}`
+                );
+            else navigate(`/media/${params.media}`);
+        },
+        [navigate, params]
+    );
 
-      let startAt: number | undefined;
-      if (startAtParam) startAt = parseTimestamp(startAtParam) ?? undefined;
+    const playAfterScrape = useCallback(
+        (out: RunOutput | null) => {
+            if (!out) return;
 
-      playMedia(
-        convertRunoutputToSource(out),
-        convertProviderCaption(out.stream.captions),
-        out.sourceId,
-        shouldStartFromBeginning ? 0 : startAt,
-      );
-      setShouldStartFromBeginning(false);
-    },
-    [
-      playMedia,
-      startAtParam,
-      shouldStartFromBeginning,
-      setShouldStartFromBeginning,
-    ],
-  );
+            let startAt: number | undefined;
+            if (startAtParam) startAt = parseTimestamp(startAtParam) ?? undefined;
 
-  return (
-    <PlayerPart backUrl={backUrl} onMetaChange={metaChange}>
-      {status === playerStatus.IDLE ? (
-        <MetaPart onGetMeta={setPlayerMeta} />
-      ) : null}
-      {status === playerStatus.SCRAPING && scrapeMedia ? (
-        <ScrapingPart
-          media={scrapeMedia}
-          onResult={(sources, sourceOrder) => {
-            setErrorData({
-              sourceOrder,
-              sources,
-            });
-            setScrapeNotFound();
-          }}
-          onGetStream={playAfterScrape}
-        />
-      ) : null}
-      {status === playerStatus.SCRAPE_NOT_FOUND && errorData ? (
-        <ScrapeErrorPart data={errorData} />
-      ) : null}
-      {status === playerStatus.PLAYBACK_ERROR ? <PlaybackErrorPart /> : null}
-    </PlayerPart>
-  );
+            playMedia(
+                convertRunoutputToSource(out),
+                convertProviderCaption(out.stream.captions),
+                out.sourceId,
+                shouldStartFromBeginning ? 0 : startAt
+            );
+            setShouldStartFromBeginning(false);
+        },
+        [
+            playMedia,
+            startAtParam,
+            shouldStartFromBeginning,
+            setShouldStartFromBeginning
+        ]
+    );
+
+    return (
+        <PlayerPart backUrl={backUrl} onMetaChange={metaChange}>
+            {status === playerStatus.IDLE ? (
+                <MetaPart onGetMeta={setPlayerMeta} />
+            ) : null}
+            {status === playerStatus.SCRAPING && scrapeMedia ? (
+                <ScrapingPart
+                    media={scrapeMedia}
+                    onResult={(sources, sourceOrder) => {
+                        setErrorData({
+                            sourceOrder,
+                            sources
+                        });
+                        setScrapeNotFound();
+                    }}
+                    onGetStream={playAfterScrape}
+                />
+            ) : null}
+            {status === playerStatus.SCRAPE_NOT_FOUND && errorData ? (
+                <ScrapeErrorPart data={errorData} />
+            ) : null}
+            {status === playerStatus.PLAYBACK_ERROR ? <PlaybackErrorPart /> : null}
+        </PlayerPart>
+    );
 }
 
 export function PlayerView() {
-  const loc = useLocation();
-  const { loading, error, value } = useAsync(() => {
-    return needsOnboarding();
-  });
+    const loc = useLocation();
+    const { loading, error, value } = useAsync(() => {
+        return needsOnboarding();
+    });
 
-  if (error) throw new Error("Failed to detect onboarding");
-  if (loading) return null;
-  if (value)
-    return (
-      <Navigate
-        replace
-        to={{
-          pathname: "/onboarding",
-          search: `redirect=${encodeURIComponent(loc.pathname)}`,
-        }}
-      />
-    );
-  return <RealPlayerView />;
+    if (error) throw new Error("Failed to detect onboarding");
+    if (loading) return null;
+    if (value)
+        return (
+            <Navigate
+                replace
+                to={{
+                    pathname: "/onboarding",
+                    search: `redirect=${encodeURIComponent(loc.pathname)}`
+                }}
+            />
+        );
+    return <RealPlayerView />;
 }
 
 export default PlayerView;
